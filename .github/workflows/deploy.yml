@@ -1,21 +1,22 @@
 name: Deploy to GitHub Pages
 
-# 推送到 main 或打 v* 标签时自动构建并发布到 gh-pages 分支
+# 推送到 main 时自动构建并发布到 GitHub Pages（首次运行会自动启用 Pages）
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,10 +42,23 @@ jobs:
           # 默认按 "/<仓库名>/" 作为 base，改名仓库时无需改代码
           VITE_BASE: /${{ github.event.repository.name }}/
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./dist
-          commit_message: "deploy: ${{ github.sha }}"
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

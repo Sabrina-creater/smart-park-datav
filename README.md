@@ -123,7 +123,7 @@ src/
 
 ## 部署到 GitHub Pages
 
-仓库内置 `.github/workflows/deploy.yml`：推送到 `main` 分支（或打 `v*` 标签）会自动构建并发布到 `gh-pages` 分支。首次使用请在仓库 **Settings → Pages** 中把 Source 设为 `gh-pages` 分支。工作流会自动把 `VITE_BASE` 设为 `/<仓库名>/`，仓库改名也无需改代码。
+仓库内置 `.github/workflows/deploy.yml`：推送到 `main` 分支会自动构建并通过 GitHub Actions 发布到 Pages，首次运行会自动启用 Pages，发布地址为 `https://<用户名>.github.io/<仓库名>/`。工作流会自动把 `VITE_BASE` 设为 `/<仓库名>/`，仓库改名也无需改代码。若首次运行提示没有权限启用 Pages，到仓库 **Settings → Pages** 把 Source 选为 **GitHub Actions** 后重新运行即可。
 
 ## 致谢与许可
 
