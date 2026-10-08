@@ -1,0 +1,7 @@
+smart-park-datav
+Copyright 2026 Sabrina-creater
+
+本项目基于 knight-L/sc-datav（https://github.com/knight-L/sc-datav，Apache License 2.0）
+二次开发：沿用了其工程结构、通用组件（图表封装、无缝滚动表格、数字动画、自适应容器）、
+Hooks、部分 Shader 思路与贴图素材（fly_line.png、guangquan01.png、ring.png）。
+在此向原作者致谢。
