@@ -185,6 +185,7 @@ export default function Detail() {
               <NumberAnimation
                 value={building ? building.companies : overview.companies}
                 duration={0.8}
+                options={{ maximumFractionDigits: 0 }}
               />
               <i>家</i>
             </div>
@@ -195,6 +196,7 @@ export default function Detail() {
               <NumberAnimation
                 value={building ? building.people : overview.people}
                 duration={0.8}
+                options={{ maximumFractionDigits: 0 }}
               />
               <i>人</i>
             </div>
@@ -202,7 +204,11 @@ export default function Detail() {
           <Stat $color={openAlarms > 0 ? theme.danger : theme.success}>
             <span>未关闭告警</span>
             <div>
-              <NumberAnimation value={openAlarms} duration={0.6} />
+              <NumberAnimation
+                value={openAlarms}
+                duration={0.6}
+                options={{ maximumFractionDigits: 0 }}
+              />
               <i>
                 条
                 {building && ` · 入驻率 ${Math.round(building.occupancy * 100)}%`}
