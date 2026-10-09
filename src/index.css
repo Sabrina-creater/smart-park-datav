@@ -12,7 +12,7 @@ body,
   margin: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: clip;
   background: #020812;
   color: #e8efff;
   font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
