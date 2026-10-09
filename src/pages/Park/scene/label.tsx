@@ -2,6 +2,7 @@ import { Html } from "@react-three/drei";
 import styled from "styled-components";
 import { useConfigStore } from "@/stores";
 import { BUILDING_TYPE_LABEL, type Building } from "@/data/bund";
+import { labelTop } from "./shapes";
 import { theme } from "@/theme";
 
 const Tag = styled.div<{ $active: boolean }>`
@@ -68,13 +69,12 @@ export default function Label({ building, active }: LabelProps) {
   const show = useConfigStore((s) => s.sceneReady && s.labels);
   if (!show || !(building.label || active)) return null;
 
-  const [, h] = building.size;
+  const top = labelTop(building);
 
   return (
     <Html
       center
-      position={[0, h + 0.9, 0]}
-      distanceFactor={40}
+      position={[0, top + 1.2, 0]}
       zIndexRange={[active ? 60 : 40, 0]}
       style={{ pointerEvents: "none" }}>
       <Tag $active={active}>

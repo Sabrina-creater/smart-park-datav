@@ -33,7 +33,7 @@ export default function Bridge() {
   );
 
   return (
-    <group position={[x, 0, z]}>
+    <group position={[x, -0.37, z]}>
       {/* 桥面 */}
       <mesh position-y={0.28}>
         <boxGeometry args={[span + 1, 0.2, width]} />

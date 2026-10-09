@@ -19,7 +19,7 @@ import {
   overview,
   visitorFlow,
 } from "@/data/bund";
-import { useConfigStore } from "@/stores";
+import { useConfigStore, useLiveStore } from "@/stores";
 import { theme } from "@/theme";
 
 type BarOption = ComposeOption<
@@ -139,6 +139,8 @@ const ChartBox = styled.div`
 export default function Detail() {
   const selected = useConfigStore((s) => s.selected);
   const select = useConfigStore((s) => s.select);
+  const livePeople = useLiveStore((s) => s.peopleNow);
+  const liveEnergy = useLiveStore((s) => s.energyToday);
   const building = selected ? buildingMap[selected] : null;
 
   const openAlarms = building
@@ -183,7 +185,7 @@ export default function Detail() {
             <span>{building ? "当前在场" : "实时在场"}</span>
             <div>
               <NumberAnimation
-                value={building ? building.people : overview.peopleNow}
+                value={building ? building.people : livePeople}
                 duration={0.8}
                 options={{ maximumFractionDigits: 0 }}
               />
@@ -194,7 +196,7 @@ export default function Detail() {
             <span>今日用电</span>
             <div>
               <NumberAnimation
-                value={building ? building.energyToday : overview.energyToday}
+                value={building ? building.energyToday : liveEnergy}
                 duration={0.8}
                 options={{ maximumFractionDigits: 0 }}
               />
