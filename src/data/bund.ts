@@ -81,11 +81,11 @@ export const FLOODLIT_TYPES: BuildingType[] = ["historic", "hotel"];
 
 export const buildings: Building[] = [
   // ---------- 浦东 · 陆家嘴（对岸，z < 0） ----------
-  { id: "P1", beacon: true, label: true, name: "东方明珠广播电视塔", type: "landmark", shape: "pearl", position: [-15.5, -10], size: [5, 33, 5], height: 468, floors: 3, builtYear: 1994, people: 6800, energyToday: 9800, load: 0.76 },
+  { id: "P1", beacon: true, label: true, name: "东方明珠", type: "landmark", shape: "pearl", position: [-15.5, -10], size: [5, 33, 5], height: 468, floors: 3, builtYear: 1994, people: 6800, energyToday: 9800, load: 0.76 },
   { id: "P2", beacon: true, label: true, name: "上海中心大厦", type: "skyscraper", shape: "twist", position: [8.5, -15.5], size: [6, 45, 6], height: 632, floors: 128, builtYear: 2015, people: 12400, energyToday: 38600, load: 0.71 },
-  { id: "P3", beacon: true, label: true, name: "上海环球金融中心", type: "skyscraper", shape: "swfc", position: [2.5, -19.5], size: [5, 35, 4], height: 492, floors: 101, builtYear: 2008, people: 9600, energyToday: 29400, load: 0.68 },
-  { id: "P4", beacon: true, label: true, name: "金茂大厦", type: "skyscraper", shape: "jinmao", position: [-6.5, -14.5], size: [5, 30, 5], height: 420, floors: 88, builtYear: 1999, people: 8200, energyToday: 24800, load: 0.73 },
-  { id: "P5", label: true, name: "上海国际会议中心", type: "culture", shape: "globe", position: [-24, -10], size: [8, 4, 5], height: 70, floors: 10, builtYear: 1999, people: 1900, energyToday: 6200, load: 0.52 },
+  { id: "P3", beacon: true, label: true, name: "环球金融中心", type: "skyscraper", shape: "swfc", position: [2.5, -19.5], size: [5, 35, 4], height: 492, floors: 101, builtYear: 2008, people: 9600, energyToday: 29400, load: 0.68 },
+  { id: "P4", beacon: true, name: "金茂大厦", type: "skyscraper", shape: "jinmao", position: [-6.5, -14.5], size: [5, 30, 5], height: 420, floors: 88, builtYear: 1999, people: 8200, energyToday: 24800, load: 0.73 },
+  { id: "P5", name: "上海国际会议中心", type: "culture", shape: "globe", position: [-24, -10], size: [8, 4, 5], height: 70, floors: 10, builtYear: 1999, people: 1900, energyToday: 6200, load: 0.52 },
   { id: "P6", beacon: true, screen: true, name: "震旦国际大楼", type: "office", position: [-9, -9], size: [4, 13, 4], height: 185, floors: 38, builtYear: 2003, people: 3000, energyToday: 8200, load: 0.82 },
   { id: "P7", beacon: true, name: "中银大厦", type: "office", position: [15, -14], size: [4, 18, 4], height: 226, floors: 53, builtYear: 2000, people: 3600, energyToday: 9800, load: 0.79 },
   { id: "P8", beacon: true, name: "平安金融大厦", type: "office", position: [-13, -20], size: [4, 17, 4], height: 233, floors: 48, builtYear: 2009, people: 3300, energyToday: 9100, load: 0.74 },
@@ -97,14 +97,14 @@ export const buildings: Building[] = [
   // ---------- 浦西 · 外滩建筑群（近岸，z > 0，自南向北即自右向左；汉口路、南京东路、北京东路位于真实的楼间缺口） ----------
   { id: "B1", name: "亚细亚大楼", type: "historic", position: [35.8, 15.5], size: [5, 5.2, 4], height: 36, floors: 8, builtYear: 1916, people: 320, energyToday: 1100, load: 0.58 },
   { id: "B2", name: "上海总会大楼", type: "historic", position: [30.55, 15.5], size: [4.5, 4.6, 4], height: 30, floors: 6, builtYear: 1910, people: 260, energyToday: 960, load: 0.62 },
-  { id: "B5", label: true, name: "汇丰银行大楼", type: "historic", shape: "dome", position: [23.55, 15.5], size: [8.5, 5.4, 4.5], height: 40, floors: 7, builtYear: 1923, people: 860, energyToday: 2400, load: 0.66 },
+  { id: "B5", name: "汇丰银行大楼", type: "historic", shape: "dome", position: [23.55, 15.5], size: [8.5, 5.4, 4.5], height: 40, floors: 7, builtYear: 1923, people: 860, energyToday: 2400, load: 0.66 },
   { id: "B6", label: true, name: "海关大楼", type: "historic", shape: "clock", position: [16.05, 15.5], size: [5.5, 5, 4.5], height: 79, floors: 11, builtYear: 1927, people: 540, energyToday: 1800, load: 0.6 },
   { id: "B7", name: "交通银行大楼", type: "historic", position: [7.8, 15.5], size: [4, 4.6, 4], height: 31, floors: 6, builtYear: 1948, people: 300, energyToday: 1040, load: 0.57 },
   { id: "B8", name: "字林西报大楼", type: "historic", position: [3.4, 15.5], size: [3.8, 4.9, 4], height: 38, floors: 9, builtYear: 1924, people: 330, energyToday: 1120, load: 0.63 },
   { id: "B9", name: "外滩18号", type: "historic", position: [-0.8, 15.5], size: [3.6, 4.6, 4], height: 30, floors: 5, builtYear: 1923, people: 420, energyToday: 1500, load: 0.78 },
   { id: "B10", name: "和平饭店南楼", type: "hotel", position: [-5.0, 15.5], size: [3.8, 4.4, 4], height: 28, floors: 6, builtYear: 1908, people: 260, energyToday: 1300, load: 0.81 },
   { id: "B11", label: true, name: "和平饭店北楼", type: "hotel", shape: "pyramid", position: [-12.4, 15.5], size: [5, 6, 4.5], height: 77, floors: 13, builtYear: 1929, people: 680, energyToday: 3200, load: 0.88, accent: "#3fd0a0" },
-  { id: "B12", label: true, name: "中国银行大楼", type: "historic", shape: "pyramid", position: [-17.9, 15.5], size: [5, 6.2, 4.5], height: 70, floors: 17, builtYear: 1937, people: 760, energyToday: 2600, load: 0.64, accent: "#5aa0ff" },
+  { id: "B12", name: "中国银行大楼", type: "historic", shape: "pyramid", position: [-17.9, 15.5], size: [5, 6.2, 4.5], height: 70, floors: 17, builtYear: 1937, people: 760, energyToday: 2600, load: 0.64, accent: "#5aa0ff" },
   { id: "B13", name: "怡和洋行大楼", type: "historic", position: [-23.15, 15.5], size: [4.5, 4.8, 4], height: 32, floors: 7, builtYear: 1922, people: 290, energyToday: 1000, load: 0.56 },
   { id: "B14", name: "外滩源壹号", type: "culture", position: [-30, 20.5], size: [3.6, 2.6, 4], height: 15, floors: 2, builtYear: 1873, people: 160, energyToday: 420, load: 0.4 },
   { id: "B15", label: true, name: "上海大厦", type: "hotel", position: [-38.5, 15.5], size: [5, 7.5, 4.5], height: 77, floors: 22, builtYear: 1934, people: 520, energyToday: 2900, load: 0.74 },

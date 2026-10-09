@@ -13,7 +13,8 @@ export function labelTop(b: Building): number {
     case "jinmao":
       return h * 0.96 + h * 0.12;
     case "twist":
-      return h + 0.6;
+      // 标签挂在塔身上部，避免顶在画面边缘
+      return h * 0.8;
     default:
       return h;
   }
