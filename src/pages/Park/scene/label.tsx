@@ -1,4 +1,5 @@
 import { Html } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import styled from "styled-components";
 import { useConfigStore } from "@/stores";
 import { BUILDING_TYPE_LABEL, type Building } from "@/data/bund";
@@ -11,9 +12,9 @@ const Tag = styled.div<{ $active: boolean }>`
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.25;
   white-space: nowrap;
   color: ${theme.text};
@@ -24,7 +25,7 @@ const Tag = styled.div<{ $active: boolean }>`
   box-shadow: ${({ $active }) =>
     $active ? `0 0 14px ${theme.primary}` : "none"};
   backdrop-filter: blur(4px);
-  transform: translateY(-50%);
+  transform-origin: 50% 100%;
   transition: background 0.2s, box-shadow 0.2s;
 
   &::after {
@@ -39,7 +40,7 @@ const Tag = styled.div<{ $active: boolean }>`
 `;
 
 const Type = styled.span`
-  font-size: 10px;
+  font-size: 11px;
   color: ${theme.textMuted};
   letter-spacing: 1px;
 `;
@@ -51,7 +52,7 @@ const Detail = styled.div`
   margin-top: 2px;
   padding-top: 4px;
   border-top: 1px dashed rgba(255, 255, 255, 0.25);
-  font-size: 11px;
+  font-size: 12px;
   color: ${theme.textMuted};
 
   b {
@@ -67,8 +68,11 @@ export interface LabelProps {
 
 export default function Label({ building, active }: LabelProps) {
   const show = useConfigStore((s) => s.sceneReady && s.labels);
+  const size = useThree((s) => s.size);
   if (!show || !(building.label || active)) return null;
 
+  // 与面板一致：按 1920 × 1080 设计稿等比缩放标签
+  const scale = Math.min(size.width / 1920, size.height / 1080);
   const top = labelTop(building);
 
   return (
@@ -77,7 +81,7 @@ export default function Label({ building, active }: LabelProps) {
       position={[0, top + 1.2, 0]}
       zIndexRange={[active ? 60 : 40, 0]}
       style={{ pointerEvents: "none" }}>
-      <Tag $active={active}>
+      <Tag $active={active} style={{ transform: `translateY(-50%) scale(${scale})` }}>
         <strong>{building.name}</strong>
         <Type>
           {BUILDING_TYPE_LABEL[building.type]} · {building.height} m
