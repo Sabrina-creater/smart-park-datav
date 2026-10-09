@@ -5,6 +5,7 @@ import { OrbitControls, Preload } from "@react-three/drei";
 import { useConfigStore } from "@/stores";
 import { theme } from "@/theme";
 import Lights from "./lights";
+import Sky from "./sky";
 import Ground from "./ground";
 import River from "./river";
 import Roads from "./roads";
@@ -38,8 +39,9 @@ export default function Scene() {
         gl={{ antialias: true, powerPreference: "high-performance" }}
         onPointerMissed={() => useConfigStore.getState().select(null)}>
         <color attach="background" args={[theme.bg]} />
-        <fog attach="fog" args={[theme.bg, 160, 380]} />
+        <fog attach="fog" args={[theme.bg, 220, 520]} />
         <Lights />
+        <Sky />
         <Suspense fallback={null}>
           <Ground />
           <River />

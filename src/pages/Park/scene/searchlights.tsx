@@ -4,6 +4,7 @@ import { AdditiveBlending, DoubleSide, type Group } from "three";
 import { searchlights } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { ConeLightMaterial } from "./materials";
+import { getRadialTexture } from "./textures";
 
 const LENGTH = 70;
 
@@ -33,12 +34,24 @@ export default function Searchlights() {
               side={DoubleSide}
               blending={AdditiveBlending}
               uColor="#fff1cc"
-              uOpacity={0.3}
+              uOpacity={0.24}
             />
           </mesh>
           <mesh>
             <sphereGeometry args={[0.35, 10, 8]} />
-            <meshBasicMaterial color="#ffffff" />
+            <meshBasicMaterial color="#ffffff" toneMapped={false} />
+          </mesh>
+          <mesh rotation-x={-Math.PI / 2} position-y={-0.2}>
+            <planeGeometry args={[2.6, 2.6]} />
+            <meshBasicMaterial
+              map={getRadialTexture()}
+              color="#fff1cc"
+              transparent
+              opacity={0.5}
+              depthWrite={false}
+              blending={AdditiveBlending}
+              toneMapped={false}
+            />
           </mesh>
         </group>
       ))}

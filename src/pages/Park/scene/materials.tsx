@@ -65,7 +65,7 @@ export const BuildingMaterial = extend(
         float wy = smoothstep(0.2, 0.32, cell.y) * (1.0 - smoothstep(0.62, 0.74, cell.y));
         float win = wx * wy * side * step(0.03, h) * step(h, 0.95);
         float lit = step(0.5, hash(cellId + uSeed + floor(uTime * 0.12) * 0.37));
-        col += uWindow * win * (0.12 + 0.4 * lit) * (1.0 - 0.45 * uFlood);
+        col += uWindow * win * (0.12 + 0.4 * lit) * (1.0 - 0.45 * uFlood) * (1.0 - 0.5 * uStripe);
 
         // 泛光照明：檐口发光 + 立面柱廊竖向亮纹
         float cornice = smoothstep(0.86, 0.95, h) * (1.0 - step(0.985, h));
@@ -77,7 +77,7 @@ export const BuildingMaterial = extend(
         float ang = atan(vPos.z, vPos.x) / 6.2831853;
         float sp = fract(h * 7.0 - ang + uTime * 0.04);
         float stripe = smoothstep(0.0, 0.04, sp) * (1.0 - smoothstep(0.07, 0.12, sp));
-        col += uScan * stripe * uStripe * 0.9 * side;
+        col += uScan * stripe * uStripe * 1.3 * side;
 
         // 扫光带
         float band = 0.12;
@@ -93,7 +93,6 @@ export const BuildingMaterial = extend(
         col += uScan * uHighlight * 0.45;
 
         gl_FragColor = vec4(col, uOpacity);
-        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `
@@ -158,7 +157,6 @@ export const LandmarkMaterial = extend(
         col += uScan * uHighlight * 0.45;
 
         gl_FragColor = vec4(col, uOpacity);
-        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `
@@ -192,13 +190,14 @@ export const BeamMaterial = extend(
   )
 );
 
-/** 江面波光材质：流动的亮斑叠加在反射水面上 */
+/** 江面波光材质：按岸别着色（浦西暖、浦东冷）的横向流动亮斑，叠加在反射水面上 */
 export const RippleMaterial = extend(
   shaderMaterial(
     {
       uTime: 0,
-      uColor: new Color("#5ad8ff"),
-      uOpacity: 0.35,
+      uWarm: new Color("#ffc45e"),
+      uCold: new Color("#7fb0ff"),
+      uOpacity: 0.45,
       uScale: 1,
     },
     /* glsl */ `
@@ -210,7 +209,8 @@ export const RippleMaterial = extend(
     `,
     /* glsl */ `
       uniform float uTime;
-      uniform vec3 uColor;
+      uniform vec3 uWarm;
+      uniform vec3 uCold;
       uniform float uOpacity;
       uniform float uScale;
       varying vec2 vUv;
@@ -231,14 +231,16 @@ export const RippleMaterial = extend(
       }
 
       void main() {
-        vec2 p = vUv * uScale;
-        float n = noise(p * 6.0 + vec2(uTime * 0.25, uTime * 0.08));
-        n += 0.5 * noise(p * 14.0 - vec2(uTime * 0.18, uTime * 0.3));
+        vec2 p = vec2(vUv.x * uScale, vUv.y);
+        // 各向异性采样：亮斑沿江面横向拉成短条
+        float n = noise(vec2(p.x * 9.0, p.y * 2.5) + vec2(uTime * 0.25, uTime * 0.08));
+        n += 0.5 * noise(vec2(p.x * 20.0, p.y * 5.0) - vec2(uTime * 0.18, uTime * 0.3));
         n /= 1.5;
         float glint = smoothstep(0.62, 0.9, n);
-        // 边缘淡出，避免硬边
         float edge = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.92, 1.0, vUv.y));
-        gl_FragColor = vec4(uColor, glint * uOpacity * edge);
+        // uv.y = 1 为浦东岸，uv.y = 0 为浦西岸
+        vec3 c = mix(uWarm, uCold, smoothstep(0.25, 0.8, vUv.y));
+        gl_FragColor = vec4(c, glint * uOpacity * edge);
       }
     `
   )
@@ -280,24 +282,56 @@ export const LedMaterial = extend(
   )
 );
 
-/** 探照灯锥体材质：尖端亮、远端淡出 */
+/** 探照灯锥体材质：尖端亮、远端淡出，正对视线处最密（体积感） */
 export const ConeLightMaterial = extend(
   shaderMaterial(
     { uColor: new Color("#cfe9ff"), uOpacity: 0.12 },
     /* glsl */ `
       varying vec2 vUv;
+      varying vec3 vWorldNormal;
+      varying vec3 vViewDir;
       void main() {
         vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vWorldNormal = normalize(mat3(modelMatrix) * normal);
+        vViewDir = normalize(cameraPosition - worldPos.xyz);
+        gl_Position = projectionMatrix * viewMatrix * worldPos;
       }
     `,
     /* glsl */ `
       uniform vec3 uColor;
       uniform float uOpacity;
       varying vec2 vUv;
+      varying vec3 vWorldNormal;
+      varying vec3 vViewDir;
       void main() {
-        float a = pow(vUv.y, 1.4) * uOpacity;
+        float core = pow(abs(dot(normalize(vWorldNormal), normalize(vViewDir))), 1.6);
+        float a = pow(vUv.y, 1.4) * core * uOpacity;
         gl_FragColor = vec4(uColor, a);
+      }
+    `
+  )
+);
+
+/** 天幕材质：地平线霞光到天顶的渐变 */
+export const SkyMaterial = extend(
+  shaderMaterial(
+    { uHorizon: new Color("#1b1744"), uZenith: new Color("#020812") },
+    /* glsl */ `
+      varying vec3 vW;
+      void main() {
+        vW = (modelMatrix * vec4(position, 1.0)).xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    /* glsl */ `
+      uniform vec3 uHorizon;
+      uniform vec3 uZenith;
+      varying vec3 vW;
+      void main() {
+        float h = normalize(vW).y;
+        float t = smoothstep(-0.02, 0.32, h);
+        gl_FragColor = vec4(mix(uHorizon, uZenith, t), 1.0);
       }
     `
   )

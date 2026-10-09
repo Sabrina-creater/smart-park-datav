@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { MeshBasicMaterial, Vector3, type CatmullRomCurve3, type Group } from "three";
+import {
+  AdditiveBlending,
+  MeshBasicMaterial,
+  Vector3,
+  type CatmullRomCurve3,
+  type Group,
+} from "three";
+import { getRadialTexture } from "./textures";
 import { boatRoutes } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { makeLoopCurve } from "./paths";
@@ -49,8 +56,30 @@ function Boat({ curve, offset, speed, kind, phase }: BoatProps) {
   const wid = cruise ? 1.5 : 1.1;
   const light = cruise ? "#ffd166" : "#9be4ff";
   // 游船灯带：游船随时间变色，轮渡固定冷白
-  const lightMat = useMemo(() => new MeshBasicMaterial({ color: light }), [light]);
-  useEffect(() => () => lightMat.dispose(), [lightMat]);
+  const lightMat = useMemo(
+    () => new MeshBasicMaterial({ color: light, toneMapped: false }),
+    [light]
+  );
+  const poolMat = useMemo(
+    () =>
+      new MeshBasicMaterial({
+        map: getRadialTexture(),
+        color: light,
+        transparent: true,
+        opacity: 0.3,
+        depthWrite: false,
+        blending: AdditiveBlending,
+        toneMapped: false,
+      }),
+    [light]
+  );
+  useEffect(
+    () => () => {
+      lightMat.dispose();
+      poolMat.dispose();
+    },
+    [lightMat, poolMat]
+  );
 
   useFrame((state, delta) => {
     if (!useConfigStore.getState().boats) return;
@@ -58,16 +87,22 @@ function Boat({ curve, offset, speed, kind, phase }: BoatProps) {
     curve.getPointAt(t.current, pos);
     curve.getTangentAt(t.current, tan);
     const bob = Math.sin(state.clock.elapsedTime * 1.4 + phase) * 0.04;
-    ref.current.position.set(pos.x, 0.05 + bob, pos.z);
-    ref.current.lookAt(pos.x + tan.x, 0.05 + bob, pos.z + tan.z);
+    // 吃水线：船体底部略低于江面（江面 y = -0.16）
+    ref.current.position.set(pos.x, -0.2 + bob, pos.z);
+    ref.current.lookAt(pos.x + tan.x, -0.2 + bob, pos.z + tan.z);
     ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.9 + phase) * 0.03;
     if (cruise) {
       lightMat.color.setHSL((state.clock.elapsedTime * 0.04 + phase * 0.17) % 1, 0.9, 0.62);
+      poolMat.color.copy(lightMat.color);
     }
   });
 
   return (
     <group ref={ref}>
+      {/* 船灯映在水面上的光斑 */}
+      <mesh rotation-x={-Math.PI / 2} position-y={0.08} material={poolMat}>
+        <planeGeometry args={[len * 1.6, len * 1.6]} />
+      </mesh>
       {/* 船体 */}
       <mesh position-y={0.22}>
         <boxGeometry args={[wid, 0.44, len]} />

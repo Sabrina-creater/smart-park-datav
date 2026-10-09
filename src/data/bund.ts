@@ -52,6 +52,8 @@ export interface Building {
   screen?: boolean;
   /** 楼顶航空障碍灯 */
   beacon?: boolean;
+  /** 单栋建筑的专属配色，覆盖类型配色 */
+  palette?: [string, string, string, string];
 }
 
 export const BUILDING_TYPE_LABEL: Record<BuildingType, string> = {
@@ -68,11 +70,11 @@ export const BUILDING_PALETTE: Record<
   BuildingType,
   [string, string, string, string]
 > = {
-  landmark: ["#4a1060", "#ff4fd8", "#ffb3f0", "#ffd6ff"],
-  skyscraper: ["#0a2448", "#3fb6ff", "#9be4ff", "#dff4ff"],
+  landmark: ["#1a0424", "#e01fb8", "#ff7ae6", "#ffc4f4"],
+  skyscraper: ["#04112a", "#0d77ff", "#54c6ff", "#bce7ff"],
   historic: ["#ffc45e", "#5a3a0e", "#ffe9a8", "#ffe0a0"],
   hotel: ["#f0b24a", "#4a3014", "#ffe3b0", "#ffe0a0"],
-  office: ["#0c2a4c", "#2fa7c9", "#8ff0ff", "#d9f8ff"],
+  office: ["#04101f", "#0a6a9c", "#46deff", "#b1f0ff"],
   culture: ["#0b2d3a", "#35d6a0", "#a8ffe0", "#d0ffee"],
 };
 
@@ -84,7 +86,7 @@ export const buildings: Building[] = [
   { id: "P1", beacon: true, label: true, name: "东方明珠", type: "landmark", shape: "pearl", position: [-15.5, -10], size: [5, 33, 5], height: 468, floors: 3, builtYear: 1994, people: 6800, energyToday: 9800, load: 0.76 },
   { id: "P2", beacon: true, label: true, name: "上海中心大厦", type: "skyscraper", shape: "twist", position: [8.5, -15.5], size: [6, 45, 6], height: 632, floors: 128, builtYear: 2015, people: 12400, energyToday: 38600, load: 0.71 },
   { id: "P3", beacon: true, label: true, name: "环球金融中心", type: "skyscraper", shape: "swfc", position: [2.5, -19.5], size: [5, 35, 4], height: 492, floors: 101, builtYear: 2008, people: 9600, energyToday: 29400, load: 0.68 },
-  { id: "P4", beacon: true, name: "金茂大厦", type: "skyscraper", shape: "jinmao", position: [-6.5, -14.5], size: [5, 30, 5], height: 420, floors: 88, builtYear: 1999, people: 8200, energyToday: 24800, load: 0.73 },
+  { id: "P4", palette: ["#2a1806", "#ffb340", "#ffe4a0", "#fff2d0"], beacon: true, name: "金茂大厦", type: "skyscraper", shape: "jinmao", position: [-6.5, -14.5], size: [5, 30, 5], height: 420, floors: 88, builtYear: 1999, people: 8200, energyToday: 24800, load: 0.73 },
   { id: "P5", name: "上海国际会议中心", type: "culture", shape: "globe", position: [-24, -10], size: [8, 4, 5], height: 70, floors: 10, builtYear: 1999, people: 1900, energyToday: 6200, load: 0.52 },
   { id: "P6", beacon: true, screen: true, name: "震旦国际大楼", type: "office", position: [-9, -9], size: [4, 13, 4], height: 185, floors: 38, builtYear: 2003, people: 3000, energyToday: 8200, load: 0.82 },
   { id: "P7", beacon: true, name: "中银大厦", type: "office", position: [15, -14], size: [4, 18, 4], height: 226, floors: 53, builtYear: 2000, people: 3600, energyToday: 9800, load: 0.79 },
@@ -167,7 +169,7 @@ export const lampLines: { from: [number, number]; to: [number, number]; step: nu
   { from: [40, 13.4], to: [-31, 13.4], step: 3 },    // 中山东一路南侧
   { from: [-36, 13.4], to: [-40, 13.4], step: 4 },
   { from: [40, -7.4], to: [-40, -7.4], step: 5 },    // 滨江大道
-  { from: [40, -3.6], to: [-40, -3.6], step: 6 },    // 浦东江岸
+  { from: [40, -4.7], to: [-40, -4.7], step: 6 },    // 浦东江岸步道
 ];
 
 /** 探照灯位置（外滩观景平台上） */

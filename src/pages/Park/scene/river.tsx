@@ -3,7 +3,6 @@ import { useFrame } from "@react-three/fiber";
 import { MeshReflectorMaterial } from "@react-three/drei";
 import { AdditiveBlending, type ShaderMaterial } from "three";
 import { waters } from "@/data/bund";
-import { theme } from "@/theme";
 import { RippleMaterial } from "./materials";
 
 /** 黄浦江（镜面反射 + 流动波光）与苏州河 */
@@ -31,15 +30,13 @@ export default function River() {
         <MeshReflectorMaterial
           blur={[240, 80]}
           resolution={1024}
-          mixBlur={1.6}
-          mixStrength={4}
-          mirror={0.6}
-          depthScale={0.6}
-          minDepthThreshold={0.6}
-          maxDepthThreshold={1.3}
-          color="#061f3d"
+          mixBlur={1}
+          mixStrength={1.4}
+          mirror={0.95}
+          depthScale={0}
+          color="#8fa6bd"
           metalness={0.4}
-          roughness={0.55}
+          roughness={0.35}
         />
       </mesh>
       {/* 波光 */}
@@ -50,8 +47,7 @@ export default function River() {
           transparent
           depthWrite={false}
           blending={AdditiveBlending}
-          uColor={theme.glow}
-          uOpacity={0.34}
+          uOpacity={0.45}
           uScale={hw / hd}
         />
       </mesh>

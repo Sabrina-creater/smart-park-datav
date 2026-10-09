@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
+  AdditiveBlending,
   BoxGeometry,
   Color,
   CylinderGeometry,
@@ -9,8 +10,12 @@ import {
   type BufferGeometry,
   type Mesh,
   type MeshBasicMaterial,
+  type Sprite,
+  type SpriteMaterial,
 } from "three";
 import { FLOODLIT_TYPES, type Building, type BuildingShape } from "@/data/bund";
+import { labelTop } from "./shapes";
+import { getRadialTexture } from "./textures";
 import { theme } from "@/theme";
 import { BuildingMaterial, LandmarkMaterial, LedMaterial } from "./materials";
 
@@ -113,19 +118,33 @@ function LedScreen({ w, h, d, seed }: { w: number; h: number; d: number; seed: n
   );
 }
 
-/** 楼顶航空障碍灯：红色闪烁 */
+/** 楼顶航空障碍灯：红色闪烁 + 光晕 */
 function Beacon({ y, phase }: { y: number; phase: number }) {
   const ref = useRef<Mesh>(null!);
+  const halo = useRef<Sprite>(null!);
   useFrame((state) => {
     const on = Math.sin(state.clock.elapsedTime * 2.2 + phase) > 0.2;
     (ref.current.material as MeshBasicMaterial).opacity = on ? 1 : 0.15;
     ref.current.scale.setScalar(on ? 1.3 : 0.8);
+    (halo.current.material as SpriteMaterial).opacity = on ? 0.9 : 0.1;
   });
   return (
-    <mesh ref={ref} position-y={y + 0.35} raycast={noRaycast}>
-      <sphereGeometry args={[0.22, 8, 6]} />
-      <meshBasicMaterial color="#ff2a3a" transparent />
-    </mesh>
+    <group position-y={y + 0.35} raycast={noRaycast}>
+      <mesh ref={ref} raycast={noRaycast}>
+        <sphereGeometry args={[0.22, 8, 6]} />
+        <meshBasicMaterial color="#ff2a3a" transparent toneMapped={false} />
+      </mesh>
+      <sprite ref={halo} scale={[1.8, 1.8, 1]} raycast={noRaycast}>
+        <spriteMaterial
+          map={getRadialTexture()}
+          color="#ff3b4a"
+          transparent
+          depthWrite={false}
+          blending={AdditiveBlending}
+          toneMapped={false}
+        />
+      </sprite>
+    </group>
   );
 }
 
@@ -238,11 +257,22 @@ function Twist({ data, colors, seed }: ShapeProps) {
       <mesh position-y={h / 2} geometry={geometry}>
         <Facade h={h} colors={colors} seed={seed} stripe />
       </mesh>
-      {/* 塔冠 */}
-      <mesh position-y={h + 0.3} raycast={noRaycast}>
-        <cylinderGeometry args={[0.08, w * 0.18, 0.6, 12]} />
-        <Glow h={0.6} colors={colors} seed={seed} />
+      {/* 塔冠：顶部亮环 + 光晕 */}
+      <mesh position-y={h - 0.45} rotation-x={Math.PI / 2} raycast={noRaycast}>
+        <torusGeometry args={[w * 0.33, 0.12, 8, 36]} />
+        <meshBasicMaterial color="#eaf8ff" toneMapped={false} />
       </mesh>
+      <sprite position-y={h - 0.3} scale={[3, 3, 1]} raycast={noRaycast}>
+        <spriteMaterial
+          map={getRadialTexture()}
+          color="#bfe8ff"
+          transparent
+          opacity={0.6}
+          depthWrite={false}
+          blending={AdditiveBlending}
+          toneMapped={false}
+        />
+      </sprite>
     </>
   );
 }
@@ -275,10 +305,16 @@ function Swfc({ data, colors, seed }: ShapeProps) {
         <boxGeometry args={[w * 0.42, h * 0.09, d * 0.5]} />
         <meshBasicMaterial color={theme.bg} />
       </mesh>
-      {/* 开口轮廓灯 */}
-      <mesh position-y={h * 0.9} raycast={noRaycast}>
-        <boxGeometry args={[w * 0.46, h * 0.1, d * 0.12]} />
-        <meshBasicMaterial color={colors[2]} transparent opacity={0.6} />
+      {/* 开口轮廓灯：紧贴暗盒前后两面的亮框 */}
+      {[1, -1].map((s) => (
+        <mesh key={s} position={[0, h * 0.9, s * (d * 0.25 - 0.06)]} raycast={noRaycast}>
+          <boxGeometry args={[w * 0.56, h * 0.13, 0.08]} />
+          <meshBasicMaterial color="#eaf6ff" toneMapped={false} />
+        </mesh>
+      ))}
+      <mesh position-y={h + 0.05} raycast={noRaycast}>
+        <boxGeometry args={[w * 0.88, 0.12, 0.3]} />
+        <meshBasicMaterial color="#eaf6ff" toneMapped={false} />
       </mesh>
     </>
   );
@@ -305,10 +341,13 @@ function Jinmao({ data, colors, seed }: ShapeProps) {
   return (
     <>
       {tiers.map((t, i) => (
-        <mesh key={i} position-y={t.y}>
-          <boxGeometry args={[t.tw, t.th, t.td]} />
-          <Facade h={t.th} colors={colors} seed={seed + i * 0.07} />
-        </mesh>
+        <group key={i}>
+          <mesh position-y={t.y}>
+            <boxGeometry args={[t.tw, t.th, t.td]} />
+            <Facade h={t.th} colors={colors} seed={seed + i * 0.07} />
+          </mesh>
+          <Cornice w={t.tw} d={t.td} y={t.y + t.th / 2} color={colors[2]} />
+        </group>
       ))}
       <mesh position-y={spireBase + h * 0.06} raycast={noRaycast}>
         <coneGeometry args={[w * 0.12, h * 0.12, 8]} />
@@ -473,7 +512,7 @@ export default function Landmark(props: ShapeProps) {
   return (
     <>
       <Shape {...props} />
-      {props.data.beacon && <Beacon y={props.data.size[1]} phase={props.seed * 6} />}
+      {props.data.beacon && <Beacon y={labelTop(props.data)} phase={props.seed * 6} />}
     </>
   );
 }

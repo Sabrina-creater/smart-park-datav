@@ -1,7 +1,14 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { gsap } from "gsap";
-import { Color, MathUtils, type Group, type Mesh, type ShaderMaterial } from "three";
+import {
+  Color,
+  MathUtils,
+  SRGBColorSpace,
+  type Group,
+  type Mesh,
+  type ShaderMaterial,
+} from "three";
 import {
   buildings,
   fillers,
@@ -34,9 +41,9 @@ function paletteOf(type: BuildingType): Colors {
 /** 东方明珠的灯光在粉 / 紫 / 蓝之间缓慢流转 */
 function cyclePearl(colors: Colors, t: number) {
   const hue = 0.74 + 0.14 * Math.sin(t * 0.25);
-  colors[0].setHSL(hue, 0.85, 0.18);
-  colors[1].setHSL(hue, 0.95, 0.62);
-  colors[2].setHSL(hue, 0.9, 0.82);
+  colors[0].setHSL(hue, 0.85, 0.12, SRGBColorSpace);
+  colors[1].setHSL(hue, 1.0, 0.5, SRGBColorSpace);
+  colors[2].setHSL(hue, 0.9, 0.72, SRGBColorSpace);
 }
 
 /** 遍历组内所有自定义着色器材质并更新 uniforms */
@@ -108,10 +115,11 @@ function BuildingMesh({ data }: { data: Building }) {
   );
   const pearl = data.shape === "pearl";
   // 东方明珠使用独立的颜色实例，便于逐帧改色而不影响同类型建筑
-  const colors = useMemo<Colors>(
-    () => (pearl ? (paletteOf(data.type).map((c) => c.clone()) as Colors) : paletteOf(data.type)),
-    [pearl, data.type]
-  );
+  const colors = useMemo<Colors>(() => {
+    if (data.palette) return data.palette.map((hex) => new Color(hex)) as Colors;
+    if (pearl) return paletteOf(data.type).map((c) => c.clone()) as Colors;
+    return paletteOf(data.type);
+  }, [pearl, data.type, data.palette]);
   const seed = useMemo(() => seedOf(data.id), [data.id]);
 
   useFrame((state, delta) => {
