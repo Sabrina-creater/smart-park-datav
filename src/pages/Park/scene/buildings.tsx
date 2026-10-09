@@ -51,8 +51,12 @@ function updateUniforms(
     const u = mat?.uniforms;
     if (!u?.uTime) return;
     u.uTime.value += delta;
-    u.uHighlight.value = MathUtils.lerp(u.uHighlight.value, highlight, 0.12);
-    u.uOpacity.value = MathUtils.lerp(u.uOpacity.value, opacity, 0.1);
+    if (u.uHighlight) {
+      u.uHighlight.value = MathUtils.lerp(u.uHighlight.value, highlight, 0.12);
+    }
+    if (u.uOpacity) {
+      u.uOpacity.value = MathUtils.lerp(u.uOpacity.value, opacity, 0.1);
+    }
   });
 }
 
