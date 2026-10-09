@@ -66,7 +66,7 @@ export interface LabelProps {
 
 export default function Label({ building, active }: LabelProps) {
   const show = useConfigStore((s) => s.sceneReady && s.labels);
-  if (!show) return null;
+  if (!show || !(building.label || active)) return null;
 
   const [, h] = building.size;
 
@@ -74,7 +74,7 @@ export default function Label({ building, active }: LabelProps) {
     <Html
       center
       position={[0, h + 0.9, 0]}
-      distanceFactor={44}
+      distanceFactor={40}
       zIndexRange={[active ? 60 : 40, 0]}
       style={{ pointerEvents: "none" }}>
       <Tag $active={active}>

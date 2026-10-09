@@ -5,8 +5,8 @@ import { Vector3 } from "three";
 import { buildingMap } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 
-const HOME_POS = new Vector3(0, 52, 96);
-const HOME_TARGET = new Vector3(0, 4, -2);
+const HOME_POS = new Vector3(0, 80, 142);
+const HOME_TARGET = new Vector3(0, 2, 4);
 
 type Controls = { target: Vector3; update: () => void } | null;
 
@@ -17,7 +17,7 @@ export default function CameraRig() {
 
   useEffect(() => {
     if (!controls) return;
-    camera.position.set(0, 180, 240);
+    camera.position.set(0, 220, 300);
     controls.target.copy(HOME_TARGET);
 
     const tl = gsap.timeline({ onUpdate: () => controls.update() });

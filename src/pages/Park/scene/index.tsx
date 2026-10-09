@@ -31,12 +31,12 @@ export default function Scene() {
   return (
     <CanvasWrapper>
       <Canvas
-        camera={{ fov: 45, near: 0.1, far: 900, position: [0, 180, 240] }}
+        camera={{ fov: 45, near: 0.1, far: 900, position: [0, 220, 300] }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
         onPointerMissed={() => useConfigStore.getState().select(null)}>
         <color attach="background" args={[theme.bg]} />
-        <fog attach="fog" args={[theme.bg, 130, 320]} />
+        <fog attach="fog" args={[theme.bg, 160, 380]} />
         <Lights />
         <Suspense fallback={null}>
           <Ground />
@@ -59,7 +59,7 @@ export default function Scene() {
           dampingFactor={0.08}
           zoomSpeed={0.5}
           minDistance={20}
-          maxDistance={240}
+          maxDistance={280}
           maxPolarAngle={Math.PI / 2 - 0.06}
           autoRotate={autoRotate}
           autoRotateSpeed={0.4}
