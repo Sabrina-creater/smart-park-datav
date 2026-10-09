@@ -47,6 +47,10 @@ export interface Building {
   accent?: string;
   /** 常显标签；未设置的建筑仅在悬停 / 选中时显示标签 */
   label?: boolean;
+  /** 朝向外滩一侧的 LED 巨幕 */
+  screen?: boolean;
+  /** 楼顶航空障碍灯 */
+  beacon?: boolean;
 }
 
 export const BUILDING_TYPE_LABEL: Record<BuildingType, string> = {
@@ -58,31 +62,36 @@ export const BUILDING_TYPE_LABEL: Record<BuildingType, string> = {
   culture: "文化场馆",
 };
 
-/** 各类型建筑的配色：[底部色, 顶部色, 扫光色] */
-export const BUILDING_PALETTE: Record<BuildingType, [string, string, string]> =
-  {
-    landmark: ["#4a1060", "#ff4fd8", "#ffb3f0"],
-    skyscraper: ["#0a2448", "#3fb6ff", "#9be4ff"],
-    historic: ["#3a2a10", "#f0c060", "#ffe9a8"],
-    hotel: ["#1a2b50", "#6c7fd6", "#b8c4ff"],
-    office: ["#0c2a4c", "#2fa7c9", "#8ff0ff"],
-    culture: ["#0b2d3a", "#35d6a0", "#a8ffe0"],
-  };
+/** 各类型建筑的配色：[底部色, 顶部色, 扫光色, 窗灯色]；历史建筑为泛光照明：底部亮、上部暗 */
+export const BUILDING_PALETTE: Record<
+  BuildingType,
+  [string, string, string, string]
+> = {
+  landmark: ["#4a1060", "#ff4fd8", "#ffb3f0", "#ffd6ff"],
+  skyscraper: ["#0a2448", "#3fb6ff", "#9be4ff", "#dff4ff"],
+  historic: ["#ffc45e", "#5a3a0e", "#ffe9a8", "#ffe0a0"],
+  hotel: ["#f0b24a", "#4a3014", "#ffe3b0", "#ffe0a0"],
+  office: ["#0c2a4c", "#2fa7c9", "#8ff0ff", "#d9f8ff"],
+  culture: ["#0b2d3a", "#35d6a0", "#a8ffe0", "#d0ffee"],
+};
+
+/** 泛光照明的建筑类型（自下而上打亮，檐口发光） */
+export const FLOODLIT_TYPES: BuildingType[] = ["historic", "hotel"];
 
 export const buildings: Building[] = [
   // ---------- 浦东 · 陆家嘴（对岸，z < 0） ----------
-  { id: "P1", label: true, name: "东方明珠广播电视塔", type: "landmark", shape: "pearl", position: [15.5, -10], size: [5, 33, 5], height: 468, floors: 3, builtYear: 1994, people: 6800, energyToday: 9800, load: 0.76 },
-  { id: "P2", label: true, name: "上海中心大厦", type: "skyscraper", shape: "twist", position: [-8.5, -15.5], size: [6, 45, 6], height: 632, floors: 128, builtYear: 2015, people: 12400, energyToday: 38600, load: 0.71 },
-  { id: "P3", label: true, name: "上海环球金融中心", type: "skyscraper", shape: "swfc", position: [-2.5, -19.5], size: [5, 35, 4], height: 492, floors: 101, builtYear: 2008, people: 9600, energyToday: 29400, load: 0.68 },
-  { id: "P4", label: true, name: "金茂大厦", type: "skyscraper", shape: "jinmao", position: [6.5, -14.5], size: [5, 30, 5], height: 420, floors: 88, builtYear: 1999, people: 8200, energyToday: 24800, load: 0.73 },
+  { id: "P1", beacon: true, label: true, name: "东方明珠广播电视塔", type: "landmark", shape: "pearl", position: [15.5, -10], size: [5, 33, 5], height: 468, floors: 3, builtYear: 1994, people: 6800, energyToday: 9800, load: 0.76 },
+  { id: "P2", beacon: true, label: true, name: "上海中心大厦", type: "skyscraper", shape: "twist", position: [-8.5, -15.5], size: [6, 45, 6], height: 632, floors: 128, builtYear: 2015, people: 12400, energyToday: 38600, load: 0.71 },
+  { id: "P3", beacon: true, label: true, name: "上海环球金融中心", type: "skyscraper", shape: "swfc", position: [-2.5, -19.5], size: [5, 35, 4], height: 492, floors: 101, builtYear: 2008, people: 9600, energyToday: 29400, load: 0.68 },
+  { id: "P4", beacon: true, label: true, name: "金茂大厦", type: "skyscraper", shape: "jinmao", position: [6.5, -14.5], size: [5, 30, 5], height: 420, floors: 88, builtYear: 1999, people: 8200, energyToday: 24800, load: 0.73 },
   { id: "P5", label: true, name: "上海国际会议中心", type: "culture", shape: "globe", position: [24, -10], size: [8, 4, 5], height: 70, floors: 10, builtYear: 1999, people: 1900, energyToday: 6200, load: 0.52 },
-  { id: "P6", name: "震旦国际大楼", type: "office", position: [9, -9], size: [4, 20, 4], height: 266, floors: 50, builtYear: 2003, people: 4100, energyToday: 11200, load: 0.82 },
-  { id: "P7", name: "中银大厦", type: "office", position: [-15, -14], size: [4, 18, 4], height: 226, floors: 53, builtYear: 2000, people: 3600, energyToday: 9800, load: 0.79 },
-  { id: "P8", name: "平安金融大厦", type: "office", position: [13, -20], size: [4, 17, 4], height: 233, floors: 48, builtYear: 2009, people: 3300, energyToday: 9100, load: 0.74 },
-  { id: "P9", name: "花旗集团大厦", type: "office", position: [19, -16], size: [4, 14, 4], height: 180, floors: 42, builtYear: 2005, people: 2800, energyToday: 7600, load: 0.69 },
-  { id: "P10", name: "上海国金中心", type: "office", position: [-17, -20], size: [4, 19, 4], height: 260, floors: 58, builtYear: 2010, people: 4300, energyToday: 12400, load: 0.8 },
+  { id: "P6", beacon: true, screen: true, name: "震旦国际大楼", type: "office", position: [9, -9], size: [4, 20, 4], height: 266, floors: 50, builtYear: 2003, people: 4100, energyToday: 11200, load: 0.82 },
+  { id: "P7", beacon: true, name: "中银大厦", type: "office", position: [-15, -14], size: [4, 18, 4], height: 226, floors: 53, builtYear: 2000, people: 3600, energyToday: 9800, load: 0.79 },
+  { id: "P8", beacon: true, name: "平安金融大厦", type: "office", position: [13, -20], size: [4, 17, 4], height: 233, floors: 48, builtYear: 2009, people: 3300, energyToday: 9100, load: 0.74 },
+  { id: "P9", screen: true, name: "花旗集团大厦", type: "office", position: [19, -16], size: [4, 14, 4], height: 180, floors: 42, builtYear: 2005, people: 2800, energyToday: 7600, load: 0.69 },
+  { id: "P10", beacon: true, name: "上海国金中心", type: "office", position: [-17, -20], size: [4, 19, 4], height: 260, floors: 58, builtYear: 2010, people: 4300, energyToday: 12400, load: 0.8 },
   { id: "P11", name: "浦东美术馆", type: "culture", position: [35, -8.5], size: [6, 3.5, 4], height: 30, floors: 4, builtYear: 2021, people: 1400, energyToday: 2600, load: 0.47 },
-  { id: "P12", name: "浦东香格里拉大酒店", type: "hotel", position: [-5, -9.5], size: [5, 12, 4], height: 152, floors: 36, builtYear: 1998, people: 1700, energyToday: 8400, load: 0.86 },
+  { id: "P12", beacon: true, name: "浦东香格里拉大酒店", type: "hotel", position: [-5, -9.5], size: [5, 12, 4], height: 152, floors: 36, builtYear: 1998, people: 1700, energyToday: 8400, load: 0.86 },
 
   // ---------- 浦西 · 外滩建筑群（近岸，z > 0，自南向北） ----------
   { id: "B1", name: "亚细亚大楼", type: "historic", position: [-34, 15.5], size: [5, 5.2, 4], height: 36, floors: 8, builtYear: 1916, people: 320, energyToday: 1100, load: 0.58 },
@@ -151,6 +160,22 @@ export interface WaterRect {
 export const waters: WaterRect[] = [
   { name: "黄浦江", x: [-42, 42], z: [-4, 8] },
   { name: "苏州河", x: [32, 35], z: [8, 28] },
+];
+
+/** 路灯布置线：[起点, 终点, 间距] */
+export const lampLines: { from: [number, number]; to: [number, number]; step: number }[] = [
+  { from: [-40, 8.7], to: [31, 8.7], step: 4 },      // 外滩观景平台
+  { from: [-40, 13.4], to: [31, 13.4], step: 5 },    // 中山东一路南侧
+  { from: [36, 13.4], to: [40, 13.4], step: 4 },
+  { from: [-40, -7.4], to: [40, -7.4], step: 5 },    // 滨江大道
+  { from: [-40, -3.6], to: [40, -3.6], step: 6 },    // 浦东江岸
+];
+
+/** 探照灯位置（外滩观景平台上） */
+export const searchlights: [number, number][] = [
+  [-22, 9.3],
+  [2, 9.3],
+  [24, 9.3],
 ];
 
 /** 外白渡桥：跨苏州河，位于中山东一路上 */

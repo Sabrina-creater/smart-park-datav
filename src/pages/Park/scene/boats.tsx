@@ -1,6 +1,6 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Vector3, type CatmullRomCurve3, type Group } from "three";
+import { MeshBasicMaterial, Vector3, type CatmullRomCurve3, type Group } from "three";
 import { boatRoutes } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { makeLoopCurve } from "./paths";
@@ -48,6 +48,9 @@ function Boat({ curve, offset, speed, kind, phase }: BoatProps) {
   const len = cruise ? 4.6 : 2.8;
   const wid = cruise ? 1.5 : 1.1;
   const light = cruise ? "#ffd166" : "#9be4ff";
+  // 游船灯带：游船随时间变色，轮渡固定冷白
+  const lightMat = useMemo(() => new MeshBasicMaterial({ color: light }), [light]);
+  useEffect(() => () => lightMat.dispose(), [lightMat]);
 
   useFrame((state, delta) => {
     if (!useConfigStore.getState().boats) return;
@@ -58,6 +61,9 @@ function Boat({ curve, offset, speed, kind, phase }: BoatProps) {
     ref.current.position.set(pos.x, 0.05 + bob, pos.z);
     ref.current.lookAt(pos.x + tan.x, 0.05 + bob, pos.z + tan.z);
     ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.9 + phase) * 0.03;
+    if (cruise) {
+      lightMat.color.setHSL((state.clock.elapsedTime * 0.04 + phase * 0.17) % 1, 0.9, 0.62);
+    }
   });
 
   return (
@@ -83,10 +89,15 @@ function Boat({ curve, offset, speed, kind, phase }: BoatProps) {
         />
       </mesh>
       {/* 舱顶灯带 */}
-      <mesh position={[0, cruise ? 0.94 : 0.86, -0.2]}>
+      <mesh position={[0, cruise ? 0.94 : 0.86, -0.2]} material={lightMat}>
         <boxGeometry args={[wid * 0.84, 0.05, len * 0.66]} />
-        <meshBasicMaterial color={light} />
       </mesh>
+      {/* 船舷串灯 */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[(s * wid) / 2, 0.46, 0]} material={lightMat}>
+          <boxGeometry args={[0.06, 0.06, len * 0.96]} />
+        </mesh>
+      ))}
       {cruise && (
         <mesh position={[0, 1.15, -0.2]}>
           <boxGeometry args={[wid * 0.5, 0.36, len * 0.4]} />

@@ -31,6 +31,14 @@ function paletteOf(type: BuildingType): Colors {
   return c;
 }
 
+/** 东方明珠的灯光在粉 / 紫 / 蓝之间缓慢流转 */
+function cyclePearl(colors: Colors, t: number) {
+  const hue = 0.74 + 0.14 * Math.sin(t * 0.25);
+  colors[0].setHSL(hue, 0.85, 0.18);
+  colors[1].setHSL(hue, 0.95, 0.62);
+  colors[2].setHSL(hue, 0.9, 0.82);
+}
+
 /** 遍历组内所有自定义着色器材质并更新 uniforms */
 function updateUniforms(
   root: Group,
@@ -87,10 +95,16 @@ function BuildingMesh({ data }: { data: Building }) {
   const isDimmed = useConfigStore(
     (s) => s.selected !== null && s.selected !== data.id
   );
-  const colors = paletteOf(data.type);
+  const pearl = data.shape === "pearl";
+  // 东方明珠使用独立的颜色实例，便于逐帧改色而不影响同类型建筑
+  const colors = useMemo<Colors>(
+    () => (pearl ? (paletteOf(data.type).map((c) => c.clone()) as Colors) : paletteOf(data.type)),
+    [pearl, data.type]
+  );
   const seed = useMemo(() => seedOf(data.id), [data.id]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
+    if (pearl) cyclePearl(colors, state.clock.elapsedTime);
     updateUniforms(groupRef.current, delta, isActive ? 1 : 0, isDimmed ? 0.5 : 1);
   });
 
@@ -141,6 +155,8 @@ function Fillers() {
               uBottom={colors[0]}
               uTop={colors[1]}
               uScan={colors[2]}
+              uWindow={colors[3]}
+              uFlood={f.type === "historic" ? 1 : 0}
             />
           </mesh>
         );

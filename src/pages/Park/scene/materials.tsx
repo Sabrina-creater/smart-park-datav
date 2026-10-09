@@ -18,6 +18,8 @@ export const BuildingMaterial = extend(
       uTop: new Color("#2f8de0"),
       uScan: new Color("#8fd3ff"),
       uWindow: new Color("#d9f3ff"),
+      uFlood: 0,
+      uStripe: 0,
     },
     /* glsl */ `
       varying vec3 vPos;
@@ -39,6 +41,8 @@ export const BuildingMaterial = extend(
       uniform vec3 uTop;
       uniform vec3 uScan;
       uniform vec3 uWindow;
+      uniform float uFlood;
+      uniform float uStripe;
 
       varying vec3 vPos;
       varying vec3 vNormal;
@@ -61,7 +65,19 @@ export const BuildingMaterial = extend(
         float wy = smoothstep(0.2, 0.32, cell.y) * (1.0 - smoothstep(0.62, 0.74, cell.y));
         float win = wx * wy * side * step(0.03, h) * step(h, 0.95);
         float lit = step(0.5, hash(cellId + uSeed + floor(uTime * 0.12) * 0.37));
-        col += uWindow * win * (0.18 + 0.55 * lit);
+        col += uWindow * win * (0.18 + 0.55 * lit) * (1.0 - 0.45 * uFlood);
+
+        // 泛光照明：檐口发光 + 立面柱廊竖向亮纹
+        float cornice = smoothstep(0.86, 0.95, h) * (1.0 - step(0.985, h));
+        col += uScan * cornice * 0.9 * uFlood;
+        float pil = 1.0 - smoothstep(0.0, 0.06, abs(fract(wc.x * 0.5) - 0.5) - 0.44);
+        col += uScan * pil * side * 0.18 * uFlood * (1.0 - h);
+
+        // 螺旋灯带（上海中心）
+        float ang = atan(vPos.z, vPos.x) / 6.2831853;
+        float sp = fract(h * 7.0 - ang + uTime * 0.04);
+        float stripe = smoothstep(0.0, 0.04, sp) * (1.0 - smoothstep(0.07, 0.12, sp));
+        col += uScan * stripe * uStripe * 0.9 * side;
 
         // 扫光带
         float band = 0.12;
@@ -71,7 +87,7 @@ export const BuildingMaterial = extend(
 
         // 顶面
         if (vNormal.y > 0.5) {
-          col = mix(uTop, uScan, 0.4);
+          col = mix(uTop, uScan, 0.4 + 0.4 * uFlood);
         }
 
         col += uScan * uHighlight * 0.45;
@@ -219,6 +235,65 @@ export const RippleMaterial = extend(
         // 边缘淡出，避免硬边
         float edge = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.92, 1.0, vUv.y));
         gl_FragColor = vec4(uColor, glint * uOpacity * edge);
+      }
+    `
+  )
+);
+
+/** LED 巨幕材质：像素网格 + 流动色带 + 扫描线 */
+export const LedMaterial = extend(
+  shaderMaterial(
+    { uTime: 0, uSeed: 0, uOpacity: 1 },
+    /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    /* glsl */ `
+      uniform float uTime;
+      uniform float uSeed;
+      uniform float uOpacity;
+      varying vec2 vUv;
+
+      void main() {
+        vec2 grid = vec2(26.0, 56.0);
+        vec2 cell = fract(vUv * grid);
+        float px = smoothstep(0.08, 0.22, cell.x) * (1.0 - smoothstep(0.78, 0.92, cell.x))
+                 * smoothstep(0.08, 0.22, cell.y) * (1.0 - smoothstep(0.78, 0.92, cell.y));
+        float t = uTime * 0.12 + uSeed * 7.0;
+        float band = sin((vUv.x * 1.5 + vUv.y * 2.5 + t) * 6.2831853) * 0.5 + 0.5;
+        float wave = sin((vUv.y * 3.0 - t * 1.4) * 6.2831853) * 0.5 + 0.5;
+        vec3 c1 = vec3(0.1, 0.55, 1.0);
+        vec3 c2 = vec3(1.0, 0.25, 0.65);
+        vec3 c3 = vec3(0.15, 1.0, 0.7);
+        vec3 col = mix(mix(c1, c2, band), c3, smoothstep(0.35, 0.95, wave) * 0.6);
+        float scanline = 0.85 + 0.15 * sin(vUv.y * 320.0 + uTime * 3.0);
+        gl_FragColor = vec4(col * (0.3 + 0.7 * px) * scanline * 1.35, uOpacity);
+      }
+    `
+  )
+);
+
+/** 探照灯锥体材质：尖端亮、远端淡出 */
+export const ConeLightMaterial = extend(
+  shaderMaterial(
+    { uColor: new Color("#cfe9ff"), uOpacity: 0.12 },
+    /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    /* glsl */ `
+      uniform vec3 uColor;
+      uniform float uOpacity;
+      varying vec2 vUv;
+      void main() {
+        float a = pow(vUv.y, 1.4) * uOpacity;
+        gl_FragColor = vec4(uColor, a);
       }
     `
   )

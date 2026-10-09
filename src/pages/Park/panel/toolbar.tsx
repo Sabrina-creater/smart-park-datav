@@ -47,7 +47,7 @@ const Pill = styled.button<{ $on: boolean }>`
 
 const toggles = [
   { key: "flyLine", label: "数据飞线" },
-  { key: "beam", label: "光束粒子" },
+  { key: "beam", label: "光束特效" },
   { key: "labels", label: "建筑标签" },
   { key: "vehicles", label: "道路车流" },
   { key: "boats", label: "江上游船" },

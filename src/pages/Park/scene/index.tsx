@@ -9,6 +9,8 @@ import Ground from "./ground";
 import River from "./river";
 import Roads from "./roads";
 import Bridge from "./bridge";
+import Lamps from "./lamps";
+import Searchlights from "./searchlights";
 import Trees from "./trees";
 import Buildings from "./buildings";
 import Vehicles from "./vehicles";
@@ -43,6 +45,8 @@ export default function Scene() {
           <River />
           <Roads />
           <Bridge />
+          <Lamps />
+          <Searchlights />
           <Trees />
           <Buildings />
           <Vehicles />

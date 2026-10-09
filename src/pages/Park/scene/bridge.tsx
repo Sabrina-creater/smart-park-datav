@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Instance, Instances } from "@react-three/drei";
 import { bridge } from "@/data/bund";
 
 /** 外白渡桥：钢桁架拱桥，跨苏州河口 */
@@ -11,6 +12,14 @@ export default function Bridge() {
         dx: k * r,
         h: Math.sqrt(Math.max(r * r - (k * r) ** 2, 0.1)),
       })),
+    [r]
+  );
+  // 拱上串灯
+  const bulbs = useMemo(
+    () => Array.from({ length: 15 }, (_, i) => {
+      const a = (i / 14) * Math.PI;
+      return [Math.cos(a) * r, Math.sin(a) * r] as [number, number];
+    }),
     [r]
   );
   const steel = (
@@ -55,6 +64,13 @@ export default function Bridge() {
             <boxGeometry args={[span * 0.72, 0.06, 0.06]} />
             {steel}
           </mesh>
+          <Instances limit={bulbs.length} range={bulbs.length}>
+            <sphereGeometry args={[0.09, 8, 6]} />
+            <meshBasicMaterial color="#fff6d6" />
+            {bulbs.map(([bx, by], i) => (
+              <Instance key={i} position={[bx, by, 0]} />
+            ))}
+          </Instances>
         </group>
       ))}
     </group>

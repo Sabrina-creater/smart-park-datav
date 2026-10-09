@@ -32,8 +32,8 @@ export default function River() {
           blur={[240, 80]}
           resolution={1024}
           mixBlur={1.6}
-          mixStrength={3}
-          mirror={0.45}
+          mixStrength={4}
+          mirror={0.6}
           depthScale={0.6}
           minDepthThreshold={0.6}
           maxDepthThreshold={1.3}
@@ -51,7 +51,7 @@ export default function River() {
           depthWrite={false}
           blending={AdditiveBlending}
           uColor={theme.glow}
-          uOpacity={0.28}
+          uOpacity={0.34}
           uScale={hw / hd}
         />
       </mesh>

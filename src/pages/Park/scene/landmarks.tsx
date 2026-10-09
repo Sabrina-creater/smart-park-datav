@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import {
   BoxGeometry,
   Color,
@@ -6,12 +7,15 @@ import {
   Quaternion,
   Vector3,
   type BufferGeometry,
+  type Mesh,
+  type MeshBasicMaterial,
 } from "three";
-import type { Building, BuildingShape } from "@/data/bund";
+import { FLOODLIT_TYPES, type Building, type BuildingShape } from "@/data/bund";
 import { theme } from "@/theme";
-import { BuildingMaterial, LandmarkMaterial } from "./materials";
+import { BuildingMaterial, LandmarkMaterial, LedMaterial } from "./materials";
 
-export type Colors = [Color, Color, Color];
+/** [底部色, 顶部色, 扫光色, 窗灯色] */
+export type Colors = [Color, Color, Color, Color];
 
 const noRaycast = () => null;
 const UP = new Vector3(0, 1, 0);
@@ -22,8 +26,16 @@ interface ShapeProps {
   seed: number;
 }
 
-/** 立面材质（渐变 + 窗户 + 扫光） */
-function Facade({ h, colors, seed }: { h: number; colors: Colors; seed: number }) {
+interface FacadeProps {
+  h: number;
+  colors: Colors;
+  seed: number;
+  flood?: boolean;
+  stripe?: boolean;
+}
+
+/** 立面材质（渐变 + 窗户 + 扫光；可选泛光照明 / 螺旋灯带） */
+function Facade({ h, colors, seed, flood, stripe }: FacadeProps) {
   return (
     <BuildingMaterial
       transparent
@@ -32,6 +44,9 @@ function Facade({ h, colors, seed }: { h: number; colors: Colors; seed: number }
       uBottom={colors[0]}
       uTop={colors[1]}
       uScan={colors[2]}
+      uWindow={colors[3]}
+      uFlood={flood ? 1 : 0}
+      uStripe={stripe ? 1 : 0}
     />
   );
 }
@@ -50,6 +65,8 @@ function Glow({ h, colors, seed }: { h: number; colors: Colors; seed: number }) 
   );
 }
 
+const isFloodlit = (d: Building) => FLOODLIT_TYPES.includes(d.type);
+
 function useDisposable<T extends BufferGeometry>(factory: () => T, deps: unknown[]) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const geo = useMemo(factory, deps);
@@ -57,27 +74,54 @@ function useDisposable<T extends BufferGeometry>(factory: () => T, deps: unknown
   return geo;
 }
 
-/** 普通方体楼：带描边；历史建筑额外加檐口 */
+/** 朝向外滩（+z）的 LED 巨幕 */
+function LedScreen({ w, h, d, seed }: { w: number; h: number; d: number; seed: number }) {
+  return (
+    <mesh position={[0, h * 0.52, d / 2 + 0.03]} raycast={noRaycast}>
+      <planeGeometry args={[w * 0.86, h * 0.72]} />
+      <LedMaterial uSeed={seed} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** 楼顶航空障碍灯：红色闪烁 */
+function Beacon({ y, phase }: { y: number; phase: number }) {
+  const ref = useRef<Mesh>(null!);
+  useFrame((state) => {
+    const on = Math.sin(state.clock.elapsedTime * 2.2 + phase) > 0.2;
+    (ref.current.material as MeshBasicMaterial).opacity = on ? 1 : 0.15;
+    ref.current.scale.setScalar(on ? 1.3 : 0.8);
+  });
+  return (
+    <mesh ref={ref} position-y={y + 0.35} raycast={noRaycast}>
+      <sphereGeometry args={[0.22, 8, 6]} />
+      <meshBasicMaterial color="#ff2a3a" transparent />
+    </mesh>
+  );
+}
+
+/** 普通方体楼：带描边；历史建筑额外加檐口；可带 LED 巨幕 */
 export function BoxBuilding({ data, colors, seed }: ShapeProps) {
   const [w, h, d] = data.size;
   const geometry = useDisposable(() => new BoxGeometry(w, h, d), [w, h, d]);
-  const historic = data.type === "historic";
+  const flood = isFloodlit(data);
 
   return (
     <>
       <mesh position-y={h / 2} geometry={geometry}>
-        <Facade h={h} colors={colors} seed={seed} />
+        <Facade h={h} colors={colors} seed={seed} flood={flood} />
       </mesh>
       <lineSegments position-y={h / 2} raycast={noRaycast}>
         <edgesGeometry args={[geometry]} />
         <lineBasicMaterial color={colors[2]} transparent opacity={0.5} />
       </lineSegments>
-      {historic && (
+      {flood && (
         <mesh position-y={h + 0.08} raycast={noRaycast}>
           <boxGeometry args={[w + 0.3, 0.16, d + 0.3]} />
-          <meshBasicMaterial color={colors[1]} />
+          <meshBasicMaterial color={colors[2]} />
         </mesh>
       )}
+      {data.screen && <LedScreen w={w} h={h} d={d} seed={seed} />}
     </>
   );
 }
@@ -168,8 +212,9 @@ function Twist({ data, colors, seed }: ShapeProps) {
   return (
     <>
       <mesh position-y={h / 2} geometry={geometry}>
-        <Facade h={h} colors={colors} seed={seed} />
+        <Facade h={h} colors={colors} seed={seed} stripe />
       </mesh>
+      {/* 塔冠 */}
       <mesh position-y={h + 0.3} raycast={noRaycast}>
         <cylinderGeometry args={[0.08, w * 0.18, 0.6, 12]} />
         <Glow h={0.6} colors={colors} seed={seed} />
@@ -205,6 +250,11 @@ function Swfc({ data, colors, seed }: ShapeProps) {
       <mesh position-y={h * 0.9} raycast={noRaycast}>
         <boxGeometry args={[w * 0.42, h * 0.09, d * 0.5]} />
         <meshBasicMaterial color={theme.bg} />
+      </mesh>
+      {/* 开口轮廓灯 */}
+      <mesh position-y={h * 0.9} raycast={noRaycast}>
+        <boxGeometry args={[w * 0.46, h * 0.1, d * 0.12]} />
+        <meshBasicMaterial color={colors[2]} transparent opacity={0.6} />
       </mesh>
     </>
   );
@@ -253,7 +303,7 @@ function Dome({ data, colors, seed }: ShapeProps) {
   return (
     <>
       <mesh position-y={baseH / 2} geometry={geometry}>
-        <Facade h={baseH} colors={colors} seed={seed} />
+        <Facade h={baseH} colors={colors} seed={seed} flood />
       </mesh>
       <lineSegments position-y={baseH / 2} raycast={noRaycast}>
         <edgesGeometry args={[geometry]} />
@@ -261,7 +311,7 @@ function Dome({ data, colors, seed }: ShapeProps) {
       </lineSegments>
       <mesh position-y={baseH + 0.08} raycast={noRaycast}>
         <boxGeometry args={[w + 0.3, 0.16, d + 0.3]} />
-        <meshBasicMaterial color={colors[1]} />
+        <meshBasicMaterial color={colors[2]} />
       </mesh>
       <mesh position-y={baseH + h * 0.09}>
         <cylinderGeometry args={[r, r, h * 0.18, 20]} />
@@ -295,7 +345,7 @@ function Clock({ data, colors, seed }: ShapeProps) {
   return (
     <>
       <mesh position-y={baseH / 2} geometry={geometry}>
-        <Facade h={baseH} colors={colors} seed={seed} />
+        <Facade h={baseH} colors={colors} seed={seed} flood />
       </mesh>
       <lineSegments position-y={baseH / 2} raycast={noRaycast}>
         <edgesGeometry args={[geometry]} />
@@ -303,7 +353,7 @@ function Clock({ data, colors, seed }: ShapeProps) {
       </lineSegments>
       <mesh position={[0, baseH + towerH / 2, 0]}>
         <boxGeometry args={[tw, towerH, td]} />
-        <Facade h={towerH} colors={colors} seed={seed + 0.2} />
+        <Facade h={towerH} colors={colors} seed={seed + 0.2} flood />
       </mesh>
       {faces.map((f, i) => (
         <mesh key={i} position={f.pos} rotation={f.rot} raycast={noRaycast}>
@@ -313,7 +363,7 @@ function Clock({ data, colors, seed }: ShapeProps) {
       ))}
       <mesh position-y={baseH + towerH + h * 0.05} raycast={noRaycast}>
         <boxGeometry args={[tw * 0.7, h * 0.1, td * 0.7]} />
-        <Facade h={h * 0.1} colors={colors} seed={seed + 0.3} />
+        <Facade h={h * 0.1} colors={colors} seed={seed + 0.3} flood />
       </mesh>
       <mesh position-y={baseH + towerH + h * 0.16} raycast={noRaycast}>
         <coneGeometry args={[tw * 0.25, h * 0.12, 8]} />
@@ -330,13 +380,18 @@ function Pyramid({ data, colors, seed }: ShapeProps) {
   const geometry = useDisposable(() => new BoxGeometry(w, baseH, d), [w, baseH, d]);
   const roof = useMemo<Colors>(() => {
     const c = new Color(data.accent ?? colors[1]);
-    return [c.clone().multiplyScalar(0.35), c, c.clone().lerp(new Color("#ffffff"), 0.4)];
+    return [
+      c.clone().multiplyScalar(0.35),
+      c,
+      c.clone().lerp(new Color("#ffffff"), 0.4),
+      colors[3],
+    ];
   }, [data.accent, colors]);
 
   return (
     <>
       <mesh position-y={baseH / 2} geometry={geometry}>
-        <Facade h={baseH} colors={colors} seed={seed} />
+        <Facade h={baseH} colors={colors} seed={seed} flood={isFloodlit(data)} />
       </mesh>
       <lineSegments position-y={baseH / 2} raycast={noRaycast}>
         <edgesGeometry args={[geometry]} />
@@ -389,8 +444,13 @@ const SHAPES: Record<BuildingShape, (p: ShapeProps) => React.JSX.Element> = {
   globe: Globe,
 };
 
-/** 按 data.shape 分发到具体形态 */
+/** 按 data.shape 分发到具体形态，并附加楼顶障碍灯 */
 export default function Landmark(props: ShapeProps) {
   const Shape = SHAPES[props.data.shape ?? "box"];
-  return <Shape {...props} />;
+  return (
+    <>
+      <Shape {...props} />
+      {props.data.beacon && <Beacon y={props.data.size[1]} phase={props.seed * 6} />}
+    </>
+  );
 }
