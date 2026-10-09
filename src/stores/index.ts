@@ -8,17 +8,18 @@ interface ConfigState {
   beam: boolean;
   labels: boolean;
   vehicles: boolean;
+  boats: boolean;
   autoRotate: boolean;
-  /** 当前选中的楼宇 id */
+  /** 当前选中的建筑 id */
   selected: string | null;
   hovered: string | null;
 }
 
 interface ConfigActions {
   toggle: (key: keyof Omit<ConfigState, "selected" | "hovered">) => void;
-  /** 切换选中（再次点击同一楼宇取消选中） */
+  /** 切换选中（再次点击同一建筑取消选中） */
   select: (id: string | null) => void;
-  /** 定位到楼宇（不切换，始终选中） */
+  /** 定位到建筑（不切换，始终选中） */
   focus: (id: string) => void;
   hover: (id: string | null) => void;
   reset: () => void;
@@ -33,6 +34,7 @@ export const useConfigStore = create<ConfigStore>()(
     beam: true,
     labels: true,
     vehicles: true,
+    boats: true,
     autoRotate: false,
     selected: null,
     hovered: null,
@@ -45,24 +47,27 @@ export const useConfigStore = create<ConfigStore>()(
 );
 
 interface LiveState {
+  visitorsToday: number;
+  peopleNow: number;
   energyToday: number;
-  vehiclesIn: number;
-  vehiclesOut: number;
-  onlineDevices: number;
+  devicesOnline: number;
   tick: () => void;
 }
 
-/** 模拟实时数据：每隔几秒自增，接真实接口时替换 tick 即可 */
+/** 模拟实时数据：每隔几秒变化，接真实接口时替换 tick 即可 */
 export const useLiveStore = create<LiveState>()((set) => ({
-  energyToday: 8642,
-  vehiclesIn: 934,
-  vehiclesOut: 915,
-  onlineDevices: 2186,
+  visitorsToday: 86420,
+  peopleNow: 23800,
+  energyToday: 42600,
+  devicesOnline: 3860,
   tick: () =>
     set((s) => ({
-      energyToday: s.energyToday + 2 + Math.round(Math.random() * 5),
-      vehiclesIn: s.vehiclesIn + (Math.random() > 0.55 ? 1 : 0),
-      vehiclesOut: s.vehiclesOut + (Math.random() > 0.6 ? 1 : 0),
-      onlineDevices: 2180 + Math.round(Math.random() * 12),
+      visitorsToday: s.visitorsToday + 8 + Math.round(Math.random() * 20),
+      peopleNow: Math.max(
+        18000,
+        s.peopleNow + Math.round((Math.random() - 0.45) * 120)
+      ),
+      energyToday: s.energyToday + 6 + Math.round(Math.random() * 12),
+      devicesOnline: 3850 + Math.round(Math.random() * 20),
     })),
 }));

@@ -1,7 +1,7 @@
 <div align="center">
-  <h1>智慧园区数字孪生运营中心</h1>
-  <p>基于 Three.js + React 19 + ECharts 的智慧园区 3D 可视化大屏</p>
-  <p>程序化 3D 园区 · 楼宇扫光 · 数据飞线 · 光束粒子 · 车流巡游 · 图表与 3D 场景双向联动</p>
+  <h1>上海外滩数字孪生运营中心</h1>
+  <p>基于 Three.js + React 19 + ECharts 的上海外滩 · 陆家嘴 3D 数字孪生大屏</p>
+  <p>程序化地标建筑 · 镜面黄浦江 · 游船车流 · 数据飞线 · 光束粒子 · 图表与 3D 场景双向联动</p>
   <p>
     <img src="https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react" alt="React">
     <img src="https://img.shields.io/badge/Three.js-0.183-black?style=flat-square&logo=three.js" alt="Three.js">
@@ -13,22 +13,23 @@
 
 ![预览](./public/preview.jpg)
 
-> 本项目基于开源模板 [knight-L/sc-datav](https://github.com/knight-L/sc-datav) 二次开发，把"省级 3D 地图大屏"改造成了"智慧园区数字孪生大屏"。所有数据均为演示用的模拟数据，集中放在 `src/data/park.ts`，换成自己园区的数据即可直接使用。
+> 本项目基于开源模板 [knight-L/sc-datav](https://github.com/knight-L/sc-datav) 二次开发，把"省级 3D 地图大屏"改造成了以上海外滩为场景的数字孪生运营大屏：浦西外滩历史建筑群、黄浦江与外白渡桥、浦东陆家嘴天际线全部由代码程序化生成，无需任何模型文件。建筑形态与相对位置按真实布局示意，所有指标均为演示用模拟数据，集中放在 `src/data/bund.ts`，换成自己的场景数据即可直接使用。
 
 ## 功能特性
 
 | 模块 | 说明 |
 | --- | --- |
-| 3D 园区场景 | 17 栋楼宇由数据驱动程序化生成（无需建模），镜面地面 + 无限网格 + 园区地块 + 道路与虚线车道 + 行道树 |
-| 楼宇材质 | 自定义 Shader：底部→顶部渐变、程序化夜景窗户（随机点亮/闪烁）、自下而上的扫光带、悬停/选中高亮、未选中楼宇自动变暗 |
-| 开场动画 | 镜头从高空推进，楼宇依次"生长"，面板随后滑入 |
-| 数据飞线 | 各楼宇 → 运营中心 的贝塞尔飞线，纹理流动 |
-| 光束粒子 | 园区上空缓缓上升的光束 |
-| 车流巡游 | 环路 / 内环 / 支路三条闭合路线，车辆带车灯沿圆角路线行驶 |
-| 告警定位 | 存在未关闭告警的楼宇脚下显示红色脉冲光圈 |
-| 双向联动 | 点击 3D 楼宇 / 楼宇标签 / 告警列表行 / 底部楼宇芯片，镜头自动飞向该楼并展示详情；点击空白处或"返回全景"回到全景 |
-| 图表面板 | 园区概况（实时跳动）、24h 电力负荷（自动滚动窗口）、车辆通行（提示框轮播）、环境舒适度雷达 + 实时指标、产业分布玫瑰图、安防告警无缝滚动表 |
-| 工具栏 | 一键开关飞线 / 光束 / 标签 / 车流 / 自动巡览 |
+| 3D 外滩场景 | 27 栋建筑由数据驱动程序化生成（无需建模）：东方明珠、上海中心（扭转收分）、环球金融中心（薄刃开口）、金茂大厦（逐级收分）、汇丰银行穹顶、海关大楼钟楼、和平饭店与中国银行的金字塔屋顶、国际会议中心双球，以及外滩历史建筑群；另有背景楼块、两岸地块、道路与行道树 |
+| 建筑材质 | 两套自定义 Shader：立面材质（渐变 + 程序化夜景窗户 + 扫光带），曲面材质（渐变 + 菲涅尔辉光 + 扫光）；悬停/选中高亮，未选中建筑自动变暗 |
+| 黄浦江 | 镜面反射江面（倒映两岸灯光）+ 流动波光 Shader；苏州河与外白渡桥钢拱 |
+| 开场动画 | 镜头从高空推进，建筑依次"生长"，面板随后滑入 |
+| 数据飞线 | 各建筑 → 东方明珠 的贝塞尔飞线，纹理流动 |
+| 光束粒子 | 两岸上空缓缓上升的光束 |
+| 车流与游船 | 中山东一路、滨江大道、陆家嘴环路三条车流路线；黄浦江上游船与轮渡巡航，随浪轻微起伏 |
+| 告警定位 | 存在未关闭告警的建筑脚下显示红色脉冲光圈 |
+| 双向联动 | 点击 3D 建筑 / 告警列表行 / 底部建筑芯片，镜头自动飞向该建筑并展示详情；点击空白处或"返回全景"回到全景 |
+| 图表面板 | 外滩概况（实时跳动）、24h 客流（自动滚动窗口）、中山东一路车辆通行（提示框轮播）、环境舒适度雷达 + 实时指标、业态分布玫瑰图、安防告警无缝滚动表、建筑详情（含该建筑 24h 客流估算） |
+| 工具栏 | 一键开关飞线 / 光束 / 标签 / 车流 / 游船 / 自动巡览 |
 | 自适应 | 基于 autofit.js 按 1920 × 1080 设计稿等比缩放，适配任意分辨率大屏 |
 
 ## 技术栈
@@ -63,15 +64,17 @@ pnpm lint
 
 ## 换成自己的数据
 
-所有演示数据集中在 **`src/data/park.ts`**，改这里即可：
+所有演示数据集中在 **`src/data/bund.ts`**，改这里即可：
 
 | 字段 | 用途 |
 | --- | --- |
-| `buildings` | 楼宇列表：名称、类型、位置 `[x, z]`、尺寸 `[宽, 高, 深]`、层数、企业数、人数、能耗、入驻率。3D 场景、标签、详情卡、飞线全部由它驱动 |
-| `BUILDING_PALETTE` | 各类型楼宇的配色（底色 / 顶色 / 扫光色） |
-| `roads` / `vehicleRoutes` | 道路中心线 与 车辆巡游路线 |
-| `overview` / `energyLoad` / `traffic` / `environment*` / `industries` | 左右面板各图表数据 |
-| `alarms` | 告警列表，`buildingId` 关联楼宇，未关闭的告警会在 3D 场景中标红 |
+| `buildings` | 建筑列表：名称、类型、形态 `shape`（box / pearl / twist / swfc / jinmao / dome / clock / pyramid / globe）、位置 `[x, z]`、尺寸 `[宽, 高, 深]`、实际高度、层数、建成年份、在场人数、能耗、负荷。3D 场景、标签、详情卡、飞线全部由它驱动 |
+| `BUILDING_PALETTE` | 各类型建筑的配色（底色 / 顶色 / 扫光色） |
+| `fillers` | 不参与交互的背景楼块 |
+| `waters` / `bridge` | 黄浦江、苏州河水域与外白渡桥位置 |
+| `roads` / `vehicleRoutes` / `boatRoutes` | 道路中心线、车辆巡游路线、游船航线 |
+| `overview` / `visitorFlow` / `traffic` / `environment*` / `industries` | 左右面板各图表数据 |
+| `alarms` | 告警列表，`buildingId` 关联建筑，未关闭的告警会在 3D 场景中标红 |
 
 - 全局配色在 `src/theme.ts`，改一处即可整体换肤。
 - 大屏标题、副标题在 `src/pages/Park/panel/header.tsx`。
@@ -88,21 +91,26 @@ src/
 │   ├── numberAnimation.tsx # 数字滚动动画
 │   ├── seamVirtualScroll.tsx # 无缝滚动表格（支持行点击）
 │   └── loading.tsx
-├── data/park.ts            # ★ 园区数据（楼宇 / 道路 / 指标 / 告警）
+├── data/bund.ts            # ★ 场景数据（建筑 / 道路 / 水域 / 指标 / 告警）
 ├── hooks/                  # useMoveTo / useRafInterval / useSize ...
-├── stores/index.ts         # Zustand：场景开关、选中楼宇、实时数据
+├── stores/index.ts         # Zustand：场景开关、选中建筑、实时数据
 ├── theme.ts                # ★ 全局配色
 └── pages/Park/
     ├── index.tsx           # 页面入口
     ├── scene/              # 3D 场景
     │   ├── index.tsx       # Canvas / 灯光 / 控制器
-    │   ├── materials.tsx   # 楼宇 Shader、光束 Shader
-    │   ├── buildings.tsx   # 楼宇（生长动画、交互）
-    │   ├── label.tsx       # 楼宇标签
-    │   ├── ground.tsx      # 镜面地面、地块、网格、光环
+    │   ├── materials.tsx   # 立面 / 曲面 / 光束 / 波光 Shader
+    │   ├── landmarks.tsx   # 地标形态（东方明珠、上海中心、环球、金茂、穹顶、钟楼…）
+    │   ├── buildings.tsx   # 建筑（生长动画、交互、背景楼块）
+    │   ├── label.tsx       # 建筑标签
+    │   ├── ground.tsx      # 两岸地块、观景平台、网格、光环
+    │   ├── river.tsx       # 黄浦江镜面与波光、苏州河
+    │   ├── bridge.tsx      # 外白渡桥
     │   ├── roads.tsx       # 道路
-    │   ├── trees.tsx       # 行道树（Instanced）
+    │   ├── trees.tsx       # 行道树与绿地（Instanced）
+    │   ├── paths.ts        # 闭合圆角路线
     │   ├── vehicles.tsx    # 车流
+    │   ├── boats.tsx       # 游船与轮渡
     │   ├── flyLine.tsx     # 数据飞线
     │   ├── beamLight.tsx   # 光束粒子
     │   ├── alarmRings.tsx  # 告警光圈
@@ -112,13 +120,13 @@ src/
         ├── header.tsx      # 标题栏 / 时钟 / 天气
         ├── toolbar.tsx     # 场景开关
         ├── card.tsx        # 卡片边框
-        ├── overview.tsx    # 园区概况
-        ├── energy.tsx      # 能耗监测
+        ├── overview.tsx    # 外滩概况
+        ├── flow.tsx        # 客流监测
         ├── traffic.tsx     # 车辆通行
         ├── environment.tsx # 环境监测
-        ├── enterprises.tsx # 产业分布
+        ├── business.tsx    # 业态分布
         ├── alarms.tsx      # 安防告警
-        └── detail.tsx      # 楼宇详情（联动）
+        └── detail.tsx      # 建筑详情（联动）
 ```
 
 ## 部署到 GitHub Pages

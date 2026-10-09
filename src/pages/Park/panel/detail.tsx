@@ -16,9 +16,9 @@ import {
   buildings,
   BUILDING_PALETTE,
   BUILDING_TYPE_LABEL,
-  energyLoad,
   overview,
-} from "@/data/park";
+  visitorFlow,
+} from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { theme } from "@/theme";
 
@@ -38,16 +38,16 @@ const Wrapper = styled.div`
 const Chips = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 `;
 
 const Chip = styled.button<{ $color: string; $on: boolean }>`
-  padding: 3px 10px;
+  padding: 2px 9px;
   border-radius: 999px;
   border: 1px solid ${(p) => (p.$on ? p.$color : "rgba(255,255,255,0.12)")};
   background: ${(p) => (p.$on ? `${p.$color}33` : "rgba(255,255,255,0.03)")};
   color: ${(p) => (p.$on ? theme.text : theme.textMuted)};
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: ${(p) => (p.$on ? `0 0 10px ${p.$color}` : "none")};
@@ -135,7 +135,7 @@ const ChartBox = styled.div`
   }
 `;
 
-/** 楼宇详情：与 3D 场景联动（点击楼宇 / 标签 / 告警行 / 芯片均可选中） */
+/** 建筑详情：与 3D 场景联动（点击建筑 / 标签 / 告警行 / 芯片均可选中） */
 export default function Detail() {
   const selected = useConfigStore((s) => s.selected);
   const select = useConfigStore((s) => s.select);
@@ -147,10 +147,10 @@ export default function Detail() {
       ).length
     : alarms.filter((a) => a.status !== "已处理").length;
 
-  // 按楼宇用电占比，从园区负荷曲线推算该楼 24h 用电
+  // 按建筑在场人数占比，从全域客流曲线推算该建筑 24h 客流
   const hourly = useMemo(() => {
-    const ratio = building ? building.energyToday / overview.energyToday : 1;
-    return energyLoad.today.map((v) => Math.round(v * ratio));
+    const ratio = building ? building.people / overview.peopleNow : 1;
+    return visitorFlow.today.map((v) => Math.round(v * ratio));
   }, [building]);
 
   const color = building ? BUILDING_PALETTE[building.type][1] : theme.primary;
@@ -172,33 +172,33 @@ export default function Detail() {
       <Body>
         <Info>
           <Name>
-            <b>{building ? building.name : "园区全景"}</b>
+            <b>{building ? building.name : "外滩全景"}</b>
             <span>
               {building
-                ? `${BUILDING_TYPE_LABEL[building.type]} · ${building.floors} 层 · 编号 ${building.id}`
-                : "点击 3D 楼宇、楼宇芯片或告警列表，查看楼宇详情并定位镜头"}
+                ? `${BUILDING_TYPE_LABEL[building.type]} · ${building.height} m · ${building.floors} 层 · 建成于 ${building.builtYear} 年`
+                : "点击 3D 建筑、建筑芯片或告警列表，查看建筑详情并定位镜头"}
             </span>
           </Name>
           <Stat>
-            <span>入驻企业</span>
+            <span>{building ? "当前在场" : "实时在场"}</span>
             <div>
               <NumberAnimation
-                value={building ? building.companies : overview.companies}
-                duration={0.8}
-                options={{ maximumFractionDigits: 0 }}
-              />
-              <i>家</i>
-            </div>
-          </Stat>
-          <Stat>
-            <span>{building ? "在园人员" : "园区人员"}</span>
-            <div>
-              <NumberAnimation
-                value={building ? building.people : overview.people}
+                value={building ? building.people : overview.peopleNow}
                 duration={0.8}
                 options={{ maximumFractionDigits: 0 }}
               />
               <i>人</i>
+            </div>
+          </Stat>
+          <Stat $color={theme.warn}>
+            <span>今日用电</span>
+            <div>
+              <NumberAnimation
+                value={building ? building.energyToday : overview.energyToday}
+                duration={0.8}
+                options={{ maximumFractionDigits: 0 }}
+              />
+              <i>kWh</i>
             </div>
           </Stat>
           <Stat $color={openAlarms > 0 ? theme.danger : theme.success}>
@@ -211,7 +211,7 @@ export default function Detail() {
               />
               <i>
                 条
-                {building && ` · 入驻率 ${Math.round(building.occupancy * 100)}%`}
+                {building && ` · 运行负荷 ${Math.round(building.load * 100)}%`}
               </i>
             </div>
           </Stat>
@@ -219,7 +219,7 @@ export default function Detail() {
 
         <ChartBox>
           <span>
-            {building ? building.name : "园区"} · 今日 24h 用电（kWh，估算）
+            {building ? building.name : "外滩全域"} · 今日 24h 客流（人/时，估算）
           </span>
           <Chart<BarOption>
             use={[BarChart, GridComponent, TooltipComponent]}
@@ -229,12 +229,12 @@ export default function Detail() {
                 backgroundColor: "rgba(4, 16, 36, 0.9)",
                 borderColor: theme.line,
                 textStyle: { color: theme.text, fontSize: 12 },
-                valueFormatter: (v) => `${v} kWh`,
+                valueFormatter: (v) => `${Number(v).toLocaleString()} 人`,
               },
               grid: { top: 6, bottom: 2, left: 2, right: 2, containLabel: true },
               xAxis: {
                 type: "category",
-                data: energyLoad.hours,
+                data: visitorFlow.hours,
                 axisLine: { lineStyle: { color: "rgba(255,255,255,0.12)" } },
                 axisTick: { show: false },
                 axisLabel: {
@@ -247,12 +247,16 @@ export default function Detail() {
               yAxis: {
                 type: "value",
                 splitLine: { lineStyle: { color: "rgba(255,255,255,0.05)" } },
-                axisLabel: { color: theme.textDim, fontSize: 10 },
+                axisLabel: {
+                  color: theme.textDim,
+                  fontSize: 10,
+                  formatter: (v: number) => (v >= 1000 ? `${v / 1000}k` : `${v}`),
+                },
               },
               series: [
                 {
                   type: "bar",
-                  name: "用电",
+                  name: "客流",
                   barWidth: "55%",
                   itemStyle: {
                     borderRadius: [2, 2, 0, 0],

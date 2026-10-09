@@ -1,13 +1,13 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { AdditiveBlending, DoubleSide, type Group } from "three";
-import { PARK_SIZE } from "@/data/park";
+import { PARK_SIZE } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { BeamMaterial } from "./materials";
 
-const COUNT = 26;
+const COUNT = 40;
 
-/** 园区上空缓缓上升的光束粒子 */
+/** 两岸上空缓缓上升的光束粒子 */
 export default function BeamLight() {
   const ref = useRef<Group>(null!);
   const visible = useConfigStore((s) => s.beam);

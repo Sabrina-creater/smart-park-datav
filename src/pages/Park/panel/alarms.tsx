@@ -5,7 +5,7 @@ import {
   ALARM_STATUS_COLOR,
   buildingMap,
   type Alarm,
-} from "@/data/park";
+} from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { theme } from "@/theme";
 

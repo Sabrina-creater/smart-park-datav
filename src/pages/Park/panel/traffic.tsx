@@ -11,7 +11,7 @@ import {
   type LegendComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
-import { traffic } from "@/data/park";
+import { traffic } from "@/data/bund";
 import { theme } from "@/theme";
 
 type BarOption = ComposeOption<

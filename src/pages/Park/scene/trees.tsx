@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Instance, Instances } from "@react-three/drei";
-import { buildings, PARK_SIZE, roads } from "@/data/park";
+import { buildings, fillers, PARK_SIZE, roads, waters } from "@/data/bund";
 
 /** 可复现的伪随机 */
 function mulberry32(a: number) {
@@ -27,17 +27,26 @@ function distToSegment(
 }
 
 const nearRoad = (x: number, z: number) =>
-  roads.some((r) => distToSegment(x, z, r.from, r.to) < 1.9);
+  roads.some((r) => distToSegment(x, z, r.from, r.to) < (r.width ?? 2.4) / 2 + 0.7);
 
+const footprints = [...buildings, ...fillers];
 const inBuilding = (x: number, z: number) =>
-  buildings.some(
+  footprints.some(
     (b) =>
-      Math.abs(x - b.position[0]) < b.size[0] / 2 + 1.1 &&
-      Math.abs(z - b.position[1]) < b.size[2] / 2 + 1.1
+      Math.abs(x - b.position[0]) < b.size[0] / 2 + 1 &&
+      Math.abs(z - b.position[1]) < b.size[2] / 2 + 1
   );
 
+const inWater = (x: number, z: number) =>
+  waters.some(
+    (w) => x >= w.x[0] - 0.6 && x <= w.x[1] + 0.6 && z >= w.z[0] - 0.6 && z <= w.z[1] + 0.6
+  );
+
+const blocked = (x: number, z: number) =>
+  inBuilding(x, z) || nearRoad(x, z) || inWater(x, z);
+
 function generateTrees() {
-  const rnd = mulberry32(20261008);
+  const rnd = mulberry32(20261009);
   const pts: { x: number; z: number; s: number }[] = [];
   const [pw, pd] = PARK_SIZE;
   const halfW = pw / 2 - 1;
@@ -52,12 +61,13 @@ function generateTrees() {
     const uz = dz / len;
     const nx = -uz;
     const nz = ux;
+    const off = (r.width ?? 2.4) / 2 + 1;
     for (let t = 1.5; t < len - 1; t += 2.6) {
       for (const side of [-1, 1]) {
-        const x = r.from[0] + ux * t + nx * side * 2.3;
-        const z = r.from[1] + uz * t + nz * side * 2.3;
+        const x = r.from[0] + ux * t + nx * side * off;
+        const z = r.from[1] + uz * t + nz * side * off;
         if (Math.abs(x) > halfW || Math.abs(z) > halfD) continue;
-        if (inBuilding(x, z) || nearRoad(x, z)) continue;
+        if (blocked(x, z)) continue;
         pts.push({
           x: x + (rnd() - 0.5) * 0.5,
           z: z + (rnd() - 0.5) * 0.5,
@@ -67,12 +77,18 @@ function generateTrees() {
     }
   });
 
-  // 中心广场绿化
-  for (let i = 0; i < 60; i++) {
-    const x = (rnd() - 0.5) * 17;
-    const z = (rnd() - 0.5) * 11;
-    if (inBuilding(x, z) || nearRoad(x, z)) continue;
+  // 陆家嘴中心绿地 / 滨江公园
+  for (let i = 0; i < 90; i++) {
+    const x = -4 + (rnd() - 0.5) * 20;
+    const z = -11 + (rnd() - 0.5) * 7;
+    if (blocked(x, z)) continue;
     pts.push({ x, z, s: 0.6 + rnd() * 0.6 });
+  }
+  for (let i = 0; i < 60; i++) {
+    const x = (rnd() - 0.5) * 80;
+    const z = -8.6 + (rnd() - 0.5) * 1.6;
+    if (blocked(x, z)) continue;
+    pts.push({ x, z, s: 0.6 + rnd() * 0.5 });
   }
 
   return pts;

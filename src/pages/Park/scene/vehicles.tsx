@@ -1,30 +1,14 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { CatmullRomCurve3, Vector3, type Group } from "three";
-import { vehicleRoutes } from "@/data/park";
+import { Vector3, type CatmullRomCurve3, type Group } from "three";
+import { vehicleRoutes } from "@/data/bund";
 import { useConfigStore } from "@/stores";
-
-/** 把矩形路线的拐角处理成圆角，生成闭合曲线 */
-function makeCurve(points: [number, number][]) {
-  const pts: Vector3[] = [];
-  const n = points.length;
-  const r = 1.4;
-  for (let i = 0; i < n; i++) {
-    const prev = points[(i - 1 + n) % n];
-    const cur = points[i];
-    const next = points[(i + 1) % n];
-    const toPrev = new Vector3(prev[0] - cur[0], 0, prev[1] - cur[1]).normalize();
-    const toNext = new Vector3(next[0] - cur[0], 0, next[1] - cur[1]).normalize();
-    pts.push(new Vector3(cur[0], 0, cur[1]).addScaledVector(toPrev, r));
-    pts.push(new Vector3(cur[0], 0, cur[1]).addScaledVector(toNext, r));
-  }
-  return new CatmullRomCurve3(pts, true, "centripetal");
-}
+import { makeLoopCurve } from "./paths";
 
 export default function Vehicles() {
   const visible = useConfigStore((s) => s.vehicles);
   const routes = useMemo(
-    () => vehicleRoutes.map((r) => ({ ...r, curve: makeCurve(r.points) })),
+    () => vehicleRoutes.map((r) => ({ ...r, curve: makeLoopCurve(r.points) })),
     []
   );
 

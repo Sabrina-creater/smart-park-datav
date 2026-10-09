@@ -9,7 +9,7 @@ import {
   type LegendComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
-import { industries, overview } from "@/data/park";
+import { industries, overview } from "@/data/bund";
 import { theme } from "@/theme";
 
 type PieOption = ComposeOption<
@@ -19,10 +19,8 @@ type PieOption = ComposeOption<
   | GraphicComponentOption
 >;
 
-const total = industries.reduce((s, i) => s + i.value, 0);
-
-/** 产业分布环图 */
-export default function Enterprises() {
+/** 业态分布环图（入驻商户） */
+export default function Business() {
   return (
     <Chart<PieOption>
       use={[PieChart, TooltipComponent, LegendComponent, GraphicComponent]}
@@ -55,7 +53,7 @@ export default function Enterprises() {
               left: "22%",
               top: "40%",
               style: {
-                text: `${overview.companies}`,
+                text: `${overview.merchants}`,
                 fill: theme.text,
                 fontSize: 26,
                 fontWeight: 700,
@@ -67,7 +65,7 @@ export default function Enterprises() {
               left: "22%",
               top: "58%",
               style: {
-                text: "入驻企业",
+                text: "入驻商户",
                 fill: theme.textMuted,
                 fontSize: 11,
                 align: "center",
@@ -89,10 +87,7 @@ export default function Enterprises() {
               scaleSize: 6,
               label: { show: false },
             },
-            data: industries.map((i) => ({
-              ...i,
-              value: Math.round((i.value / total) * overview.companies),
-            })),
+            data: industries,
           },
         ],
       }}

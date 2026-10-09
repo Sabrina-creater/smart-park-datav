@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "智慧园区 3D 可视化大屏 · Three.js + React 19 + ECharts",
+  "description": "上海外滩数字孪生 3D 可视化大屏 · Three.js + React 19 + ECharts",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

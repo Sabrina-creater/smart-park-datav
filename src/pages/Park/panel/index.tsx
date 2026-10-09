@@ -8,10 +8,10 @@ import Header from "./header";
 import Toolbar from "./toolbar";
 import Card from "./card";
 import Overview from "./overview";
-import Energy from "./energy";
+import Flow from "./flow";
 import Traffic from "./traffic";
 import Environment from "./environment";
-import Enterprises from "./enterprises";
+import Business from "./business";
 import Alarms from "./alarms";
 import Detail from "./detail";
 
@@ -65,24 +65,24 @@ export default function Panel() {
         <Card
           ref={left0.ref}
           style={{ gridArea: "1 / 1 / 3 / 2" }}
-          title="园区概况"
+          title="外滩概况"
           subtitle="Overview">
           <Overview />
         </Card>
         <Card
           ref={left1.ref}
           style={{ gridArea: "3 / 1 / 5 / 2" }}
-          title="能耗监测"
-          subtitle="Energy Load"
-          extra="单位：kW">
-          <Energy />
+          title="客流监测"
+          subtitle="Visitor Flow"
+          extra="单位：人/时">
+          <Flow />
         </Card>
         <Card
           ref={left2.ref}
           style={{ gridArea: "5 / 1 / 7 / 2" }}
           title="车辆通行"
           subtitle="Traffic"
-          extra="今日">
+          extra="中山东一路 · 今日">
           <Traffic />
         </Card>
 
@@ -96,9 +96,9 @@ export default function Panel() {
         <Card
           ref={right1.ref}
           style={{ gridArea: "3 / 4 / 5 / 5" }}
-          title="产业分布"
-          subtitle="Industries">
-          <Enterprises />
+          title="业态分布"
+          subtitle="Business">
+          <Business />
         </Card>
         <Card
           ref={right2.ref}
@@ -112,7 +112,7 @@ export default function Panel() {
         <Card
           ref={bottom.ref}
           style={{ gridArea: "5 / 2 / 7 / 4" }}
-          title="楼宇详情"
+          title="建筑详情"
           subtitle="Building">
           <Detail />
         </Card>

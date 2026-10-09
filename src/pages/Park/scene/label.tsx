@@ -1,7 +1,7 @@
 import { Html } from "@react-three/drei";
 import styled from "styled-components";
 import { useConfigStore } from "@/stores";
-import { BUILDING_TYPE_LABEL, type Building } from "@/data/park";
+import { BUILDING_TYPE_LABEL, type Building } from "@/data/bund";
 import { theme } from "@/theme";
 
 const Tag = styled.div<{ $active: boolean }>`
@@ -9,7 +9,7 @@ const Tag = styled.div<{ $active: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
@@ -73,26 +73,28 @@ export default function Label({ building, active }: LabelProps) {
   return (
     <Html
       center
-      position={[0, h + 0.8, 0]}
-      distanceFactor={34}
+      position={[0, h + 0.9, 0]}
+      distanceFactor={44}
       zIndexRange={[active ? 60 : 40, 0]}
       style={{ pointerEvents: "none" }}>
       <Tag $active={active}>
         <strong>{building.name}</strong>
-        <Type>{BUILDING_TYPE_LABEL[building.type]}</Type>
+        <Type>
+          {BUILDING_TYPE_LABEL[building.type]} · {building.height} m
+        </Type>
         {active && (
           <Detail>
             <span>
-              入驻企业 <b>{building.companies}</b> 家
+              建成 <b>{building.builtYear}</b> 年
             </span>
             <span>
-              人员 <b>{building.people.toLocaleString()}</b> 人
+              楼层 <b>{building.floors}</b> 层
+            </span>
+            <span>
+              在场 <b>{building.people.toLocaleString()}</b> 人
             </span>
             <span>
               今日用电 <b>{building.energyToday.toLocaleString()}</b> kWh
-            </span>
-            <span>
-              入驻率 <b>{Math.round(building.occupancy * 100)}%</b>
             </span>
           </Detail>
         )}

@@ -8,7 +8,7 @@ import {
   type RadarComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
-import { environment, environmentRadar } from "@/data/park";
+import { environment, environmentRadar } from "@/data/bund";
 import { theme } from "@/theme";
 
 type RadarOption = ComposeOption<
@@ -59,7 +59,7 @@ const metrics = [
   { label: "湿度", value: environment.humidity, unit: "%" },
   { label: "PM2.5", value: environment.pm25, unit: "μg/m³" },
   { label: "噪音", value: environment.noise, unit: "dB" },
-  { label: "CO₂", value: environment.co2, unit: "ppm" },
+  { label: "江面水位", value: environment.waterLevel, unit: "m" },
   { label: "风速", value: environment.wind, unit: "m/s" },
 ];
 
@@ -93,7 +93,7 @@ export default function Environment() {
           series: [
             {
               type: "radar",
-              name: "园区环境舒适度",
+              name: "外滩环境舒适度",
               symbolSize: 4,
               data: [
                 {

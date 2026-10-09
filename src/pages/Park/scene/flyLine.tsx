@@ -7,15 +7,13 @@ import {
   RepeatWrapping,
   Vector3,
 } from "three";
-import { buildingMap, buildings } from "@/data/park";
+import { buildingMap, buildings, CENTER_ID } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { theme } from "@/theme";
 
 import flyLineImg from "@/assets/fly_line.png";
 
-const CENTER_ID = "A1";
-
-/** 各楼宇 → 运营中心 的数据飞线 */
+/** 各建筑 → 汇聚点 的数据飞线 */
 export default function FlyLines() {
   const visible = useConfigStore((s) => s.flyLine && s.sceneReady);
   const texture = useTexture(flyLineImg, (tex) => {
@@ -27,7 +25,7 @@ export default function FlyLines() {
     const center = buildingMap[CENTER_ID];
     const end = new Vector3(
       center.position[0],
-      center.size[1] + 0.6,
+      center.size[1] + 0.8,
       center.position[1]
     );
     return buildings
@@ -35,7 +33,7 @@ export default function FlyLines() {
       .map((b) => {
         const start = new Vector3(b.position[0], b.size[1] + 0.3, b.position[1]);
         const mid = new Vector3().addVectors(start, end).multiplyScalar(0.5);
-        mid.y = Math.max(start.y, end.y) + start.distanceTo(end) * 0.32;
+        mid.y = Math.max(start.y, end.y) + start.distanceTo(end) * 0.22;
         return new QuadraticBezierCurve3(start, mid, end);
       });
   }, []);
@@ -47,7 +45,7 @@ export default function FlyLines() {
   return (
     <group visible={visible}>
       {curves.map((curve, i) => (
-        <mesh key={i}>
+        <mesh key={i} raycast={() => null}>
           <tubeGeometry args={[curve, 48, 0.14, 4, false]} />
           <meshBasicMaterial
             transparent

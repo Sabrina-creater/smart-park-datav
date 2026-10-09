@@ -15,7 +15,7 @@ import {
   type MarkPointComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
-import { energyLoad } from "@/data/park";
+import { visitorFlow } from "@/data/bund";
 import { theme } from "@/theme";
 
 type LineOption = ComposeOption<
@@ -58,18 +58,18 @@ const makeSeries = (
   markPoint: withMark
     ? {
         symbol: "rect",
-        symbolSize: [56, 20],
+        symbolSize: [64, 20],
         symbolOffset: [0, -12],
         itemStyle: { color: `${color}cc` },
-        label: { color: "#fff", fontSize: 11, formatter: "{c} kW" },
+        label: { color: "#fff", fontSize: 11, formatter: "峰值 {c}" },
         data: [{ type: "max", name: "峰值" }],
       }
     : undefined,
   data,
 });
 
-/** 24 小时电力负荷：今日 vs 昨日，窗口自动滚动 */
-export default function Energy() {
+/** 24 小时客流：今日 vs 昨日，窗口自动滚动 */
+export default function Flow() {
   const chartRef = useRef<EChartsType>(null);
   const start = useRef(0);
 
@@ -79,7 +79,7 @@ export default function Energy() {
       startValue: start.current,
       endValue: start.current + WINDOW,
     });
-    start.current = (start.current + 1) % (energyLoad.hours.length - WINDOW);
+    start.current = (start.current + 1) % (visitorFlow.hours.length - WINDOW);
   }, 2500);
 
   return (
@@ -99,7 +99,7 @@ export default function Energy() {
           backgroundColor: "rgba(4, 16, 36, 0.9)",
           borderColor: theme.line,
           textStyle: { color: theme.text, fontSize: 12 },
-          valueFormatter: (v) => `${v} kW`,
+          valueFormatter: (v) => `${Number(v).toLocaleString()} 人`,
         },
         legend: {
           right: 0,
@@ -112,17 +112,21 @@ export default function Energy() {
         xAxis: {
           type: "category",
           boundaryGap: false,
-          data: energyLoad.hours,
+          data: visitorFlow.hours,
           axisLine: { lineStyle: { color: "rgba(255,255,255,0.12)" } },
           axisTick: { show: false },
           axisLabel: { color: theme.textMuted, fontSize: 11 },
         },
         yAxis: {
           type: "value",
-          name: "kW",
+          name: "人/时",
           nameTextStyle: { color: theme.textDim, align: "right" },
           splitLine: { lineStyle: { color: "rgba(255,255,255,0.06)" } },
-          axisLabel: { color: theme.textMuted, fontSize: 11 },
+          axisLabel: {
+            color: theme.textMuted,
+            fontSize: 11,
+            formatter: (v: number) => (v >= 1000 ? `${v / 1000}k` : `${v}`),
+          },
         },
         dataZoom: {
           type: "slider",
@@ -132,8 +136,8 @@ export default function Energy() {
           endValue: WINDOW,
         },
         series: [
-          makeSeries("今日", energyLoad.today, colors[0], true),
-          makeSeries("昨日", energyLoad.yesterday, colors[1]),
+          makeSeries("今日", visitorFlow.today, colors[0], true),
+          makeSeries("昨日", visitorFlow.yesterday, colors[1]),
         ],
       }}
     />

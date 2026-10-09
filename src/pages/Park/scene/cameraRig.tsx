@@ -2,22 +2,22 @@ import { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { Vector3 } from "three";
-import { buildingMap } from "@/data/park";
+import { buildingMap } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 
-const HOME_POS = new Vector3(0, 40, 64);
-const HOME_TARGET = new Vector3(0, 0, 0);
+const HOME_POS = new Vector3(0, 52, 96);
+const HOME_TARGET = new Vector3(0, 4, -2);
 
 type Controls = { target: Vector3; update: () => void } | null;
 
-/** 开场镜头 + 选中楼宇时的镜头飞行 */
+/** 开场镜头 + 选中建筑时的镜头飞行 */
 export default function CameraRig() {
   const camera = useThree((s) => s.camera);
   const controls = useThree((s) => s.controls) as unknown as Controls;
 
   useEffect(() => {
     if (!controls) return;
-    camera.position.set(0, 150, 190);
+    camera.position.set(0, 180, 240);
     controls.target.copy(HOME_TARGET);
 
     const tl = gsap.timeline({ onUpdate: () => controls.update() });
@@ -48,12 +48,12 @@ export default function CameraRig() {
 
         if (id) {
           const b = buildingMap[id];
-          target.set(b.position[0], b.size[1] / 2, b.position[1]);
+          target.set(b.position[0], b.size[1] * 0.45, b.position[1]);
           dir.subVectors(camera.position, controls.target).setY(0);
           if (dir.lengthSq() < 0.01) dir.set(0, 0, 1);
           dir.normalize();
-          const dist = Math.max(b.size[1] * 2.2, 24);
-          pos.copy(target).addScaledVector(dir, dist).setY(target.y + dist * 0.6);
+          const dist = Math.max(b.size[1] * 1.3, 26);
+          pos.copy(target).addScaledVector(dir, dist).setY(target.y + dist * 0.55);
         }
 
         gsap.to(camera.position, {

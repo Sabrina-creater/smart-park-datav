@@ -1,5 +1,5 @@
 import { Line } from "@react-three/drei";
-import { roads } from "@/data/park";
+import { roads } from "@/data/bund";
 import { theme } from "@/theme";
 
 export default function Roads() {

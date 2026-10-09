@@ -31,7 +31,7 @@ export default function Loading() {
   return (
     <Wrapper>
       <Bar />
-      <span>园区数据加载中</span>
+      <span>外滩数据加载中</span>
     </Wrapper>
   );
 }

@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { AdditiveBlending, type Group } from "three";
-import { alarmBuildingIds, buildingMap } from "@/data/park";
+import { alarmBuildingIds, buildingMap } from "@/data/bund";
 import { theme } from "@/theme";
 
 import ringImg from "@/assets/guangquan01.png";

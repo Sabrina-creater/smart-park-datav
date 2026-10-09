@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import NumberAnimation from "@/components/numberAnimation";
-import { overview } from "@/data/park";
+import { overview } from "@/data/bund";
 import { useLiveStore } from "@/stores";
 import { theme } from "@/theme";
 
@@ -79,7 +79,7 @@ const Bars = styled.div`
 
 const BarRow = styled.div`
   display: grid;
-  grid-template-columns: 56px 1fr 64px;
+  grid-template-columns: 64px 1fr 76px;
   align-items: center;
   gap: 10px;
 
@@ -114,16 +114,16 @@ export default function Overview() {
   const live = useLiveStore();
 
   const tiles = [
-    { label: "入驻企业", value: overview.companies, unit: "家", color: theme.series[0] },
-    { label: "园区人员", value: overview.people, unit: "人", color: theme.series[1] },
+    { label: "今日客流", value: live.visitorsToday, unit: "人次", color: theme.series[0] },
+    { label: "实时在场", value: live.peopleNow, unit: "人", color: theme.series[1] },
     { label: "今日用电", value: live.energyToday, unit: "kWh", color: theme.series[3] },
-    { label: "在线设备", value: live.onlineDevices, unit: "台", color: theme.series[2] },
+    { label: "在线设备", value: live.devicesOnline, unit: "台", color: theme.series[2] },
   ];
 
   const bars = [
-    { label: "入驻率", value: overview.occupancy, text: `${Math.round(overview.occupancy * 100)}%` },
-    { label: "车位占用", value: overview.parkingUsed / overview.parkingTotal, text: `${overview.parkingUsed}/${overview.parkingTotal}` },
-    { label: "充电桩", value: overview.chargingUsed / overview.chargingTotal, text: `${overview.chargingUsed}/${overview.chargingTotal}` },
+    { label: "景区承载率", value: overview.capacity, text: `${Math.round(overview.capacity * 100)}%` },
+    { label: "停车位", value: overview.parkingUsed / overview.parkingTotal, text: `${overview.parkingUsed}/${overview.parkingTotal}` },
+    { label: "游船上座率", value: overview.boatOccupancy, text: `${Math.round(overview.boatOccupancy * 100)}%` },
   ];
 
   return (

@@ -1,7 +1,7 @@
 import { useState, type ComponentProps } from "react";
 import styled from "styled-components";
 import useRafInterval from "@/hooks/useRafInterval";
-import { environment } from "@/data/park";
+import { environment } from "@/data/bund";
 import { theme } from "@/theme";
 
 const Wrapper = styled.div`
@@ -191,8 +191,8 @@ export default function Header(props: ComponentProps<typeof Wrapper>) {
           <span>{now.date}</span>
         </Clock>
       </Side>
-      <Title>智慧园区数字孪生运营中心</Title>
-      <Subtitle>SMART PARK · DIGITAL TWIN OPERATION CENTER</Subtitle>
+      <Title>上海外滩数字孪生运营中心</Title>
+      <Subtitle>THE BUND · DIGITAL TWIN OPERATION CENTER</Subtitle>
       <Side $right>
         <Weather>
           <span>{environment.weather}</span>
