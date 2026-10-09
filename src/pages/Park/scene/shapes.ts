@@ -14,7 +14,7 @@ export function labelTop(b: Building): number {
       return h * 0.96 + h * 0.12;
     case "twist":
       // 标签挂在塔身上部，避免顶在画面边缘
-      return h * 0.8;
+      return h * 0.62;
     default:
       return h;
   }
