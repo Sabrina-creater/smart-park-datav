@@ -10,6 +10,8 @@ export function labelTop(b: Building): number {
       return h * 0.55 + h * 0.45 + h * 0.16 + h * 0.06;
     case "globe":
       return h + d * 0.5 * 0.75 + d * 0.5;
+    case "pyramid":
+      return h * 0.82 + h * 0.28;
     case "jinmao":
       return h * 0.96 + h * 0.12;
     case "twist":

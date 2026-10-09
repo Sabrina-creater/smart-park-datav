@@ -5,7 +5,7 @@ import { searchlights } from "@/data/bund";
 import { useConfigStore } from "@/stores";
 import { ConeLightMaterial } from "./materials";
 
-const LENGTH = 52;
+const LENGTH = 70;
 
 /** 外滩观景平台上缓缓扫动的探照灯 */
 export default function Searchlights() {
@@ -26,14 +26,14 @@ export default function Searchlights() {
         <group key={i} position={[x, 0.3, z]}>
           {/* 锥体翻转：尖端在地面，底面朝天 */}
           <mesh position-y={LENGTH / 2} rotation-x={Math.PI}>
-            <coneGeometry args={[2.6, LENGTH, 20, 1, true]} />
+            <coneGeometry args={[1.4, LENGTH, 16, 1, true]} />
             <ConeLightMaterial
               transparent
               depthWrite={false}
               side={DoubleSide}
               blending={AdditiveBlending}
-              uColor="#d6ecff"
-              uOpacity={0.13}
+              uColor="#fff1cc"
+              uOpacity={0.3}
             />
           </mesh>
           <mesh>

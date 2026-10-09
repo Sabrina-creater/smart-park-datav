@@ -98,12 +98,12 @@ export const buildings: Building[] = [
   { id: "B1", name: "亚细亚大楼", type: "historic", position: [35.8, 15.5], size: [5, 5.2, 4], height: 36, floors: 8, builtYear: 1916, people: 320, energyToday: 1100, load: 0.58 },
   { id: "B2", name: "上海总会大楼", type: "historic", position: [30.55, 15.5], size: [4.5, 4.6, 4], height: 30, floors: 6, builtYear: 1910, people: 260, energyToday: 960, load: 0.62 },
   { id: "B5", name: "汇丰银行大楼", type: "historic", shape: "dome", position: [23.55, 15.5], size: [8.5, 5.4, 4.5], height: 40, floors: 7, builtYear: 1923, people: 860, energyToday: 2400, load: 0.66 },
-  { id: "B6", label: true, name: "海关大楼", type: "historic", shape: "clock", position: [16.05, 15.5], size: [5.5, 5, 4.5], height: 79, floors: 11, builtYear: 1927, people: 540, energyToday: 1800, load: 0.6 },
+  { id: "B6", label: true, name: "海关大楼", type: "historic", shape: "clock", position: [16.05, 15.5], size: [5.5, 9.6, 4.5], height: 79, floors: 11, builtYear: 1927, people: 540, energyToday: 1800, load: 0.6 },
   { id: "B7", name: "交通银行大楼", type: "historic", position: [7.8, 15.5], size: [4, 4.6, 4], height: 31, floors: 6, builtYear: 1948, people: 300, energyToday: 1040, load: 0.57 },
   { id: "B8", name: "字林西报大楼", type: "historic", position: [3.4, 15.5], size: [3.8, 4.9, 4], height: 38, floors: 9, builtYear: 1924, people: 330, energyToday: 1120, load: 0.63 },
   { id: "B9", name: "外滩18号", type: "historic", position: [-0.8, 15.5], size: [3.6, 4.6, 4], height: 30, floors: 5, builtYear: 1923, people: 420, energyToday: 1500, load: 0.78 },
   { id: "B10", name: "和平饭店南楼", type: "hotel", position: [-5.0, 15.5], size: [3.8, 4.4, 4], height: 28, floors: 6, builtYear: 1908, people: 260, energyToday: 1300, load: 0.81 },
-  { id: "B11", label: true, name: "和平饭店北楼", type: "hotel", shape: "pyramid", position: [-12.4, 15.5], size: [5, 6, 4.5], height: 77, floors: 13, builtYear: 1929, people: 680, energyToday: 3200, load: 0.88, accent: "#3fd0a0" },
+  { id: "B11", label: true, name: "和平饭店北楼", type: "hotel", shape: "pyramid", position: [-12.4, 15.5], size: [5, 7.4, 4.5], height: 77, floors: 13, builtYear: 1929, people: 680, energyToday: 3200, load: 0.88, accent: "#3fd0a0" },
   { id: "B12", name: "中国银行大楼", type: "historic", shape: "pyramid", position: [-17.9, 15.5], size: [5, 6.2, 4.5], height: 70, floors: 17, builtYear: 1937, people: 760, energyToday: 2600, load: 0.64, accent: "#5aa0ff" },
   { id: "B13", name: "怡和洋行大楼", type: "historic", position: [-23.15, 15.5], size: [4.5, 4.8, 4], height: 32, floors: 7, builtYear: 1922, people: 290, energyToday: 1000, load: 0.56 },
   { id: "B14", name: "外滩源壹号", type: "culture", position: [-30, 20.5], size: [3.6, 2.6, 4], height: 15, floors: 2, builtYear: 1873, people: 160, energyToday: 420, load: 0.4 },
@@ -163,8 +163,8 @@ export const waters: WaterRect[] = [
 
 /** 路灯布置线：[起点, 终点, 间距] */
 export const lampLines: { from: [number, number]; to: [number, number]; step: number }[] = [
-  { from: [40, 8.7], to: [-31, 8.7], step: 4 },      // 外滩观景平台
-  { from: [40, 13.4], to: [-31, 13.4], step: 5 },    // 中山东一路南侧
+  { from: [40, 8.7], to: [-31, 8.7], step: 2.2 },      // 外滩观景平台
+  { from: [40, 13.4], to: [-31, 13.4], step: 3 },    // 中山东一路南侧
   { from: [-36, 13.4], to: [-40, 13.4], step: 4 },
   { from: [40, -7.4], to: [-40, -7.4], step: 5 },    // 滨江大道
   { from: [40, -3.6], to: [-40, -3.6], step: 6 },    // 浦东江岸

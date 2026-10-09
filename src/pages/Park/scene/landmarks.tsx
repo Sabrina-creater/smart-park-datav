@@ -67,6 +67,35 @@ function Glow({ h, colors, seed }: { h: number; colors: Colors; seed: number }) 
 
 const isFloodlit = (d: Building) => FLOODLIT_TYPES.includes(d.type);
 
+/** 泛光建筑的配色是"底亮顶暗"，穹顶 / 尖顶等曲面构件反过来用，顶部才会亮 */
+const glowColors = (colors: Colors, flood: boolean): Colors =>
+  flood ? [colors[1], colors[0], colors[2], colors[3]] : colors;
+
+/** 檐口灯带：沿屋顶边缘的一圈细亮框 */
+function Cornice({ w, d, y, color }: { w: number; d: number; y: number; color: Color }) {
+  const t = 0.14;
+  return (
+    <group position-y={y} raycast={noRaycast}>
+      <mesh position-z={d / 2}>
+        <boxGeometry args={[w + 0.3, t, t]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <mesh position-z={-d / 2}>
+        <boxGeometry args={[w + 0.3, t, t]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <mesh position-x={w / 2}>
+        <boxGeometry args={[t, t, d + 0.3]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <mesh position-x={-w / 2}>
+        <boxGeometry args={[t, t, d + 0.3]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+    </group>
+  );
+}
+
 function useDisposable<T extends BufferGeometry>(factory: () => T, deps: unknown[]) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const geo = useMemo(factory, deps);
@@ -79,7 +108,7 @@ function LedScreen({ w, h, d, seed }: { w: number; h: number; d: number; seed: n
   return (
     <mesh position={[0, h * 0.52, d / 2 + 0.03]} raycast={noRaycast}>
       <planeGeometry args={[w * 0.86, h * 0.72]} />
-      <LedMaterial uSeed={seed} toneMapped={false} />
+      <LedMaterial uSeed={seed} toneMapped={false} transparent depthWrite={false} />
     </mesh>
   );
 }
@@ -115,12 +144,7 @@ export function BoxBuilding({ data, colors, seed }: ShapeProps) {
         <edgesGeometry args={[geometry]} />
         <lineBasicMaterial color={colors[2]} transparent opacity={0.5} />
       </lineSegments>
-      {flood && (
-        <mesh position-y={h + 0.08} raycast={noRaycast}>
-          <boxGeometry args={[w + 0.3, 0.16, d + 0.3]} />
-          <meshBasicMaterial color={colors[2]} />
-        </mesh>
-      )}
+      {flood && <Cornice w={w} d={d} y={h + 0.05} color={colors[2]} />}
       {data.screen && <LedScreen w={w} h={h} d={d} seed={seed} />}
     </>
   );
@@ -309,17 +333,14 @@ function Dome({ data, colors, seed }: ShapeProps) {
         <edgesGeometry args={[geometry]} />
         <lineBasicMaterial color={colors[2]} transparent opacity={0.5} />
       </lineSegments>
-      <mesh position-y={baseH + 0.08} raycast={noRaycast}>
-        <boxGeometry args={[w + 0.3, 0.16, d + 0.3]} />
-        <meshBasicMaterial color={colors[2]} />
-      </mesh>
+      <Cornice w={w} d={d} y={baseH + 0.05} color={colors[2]} />
       <mesh position-y={baseH + h * 0.09}>
         <cylinderGeometry args={[r, r, h * 0.18, 20]} />
-        <Glow h={h * 0.18} colors={colors} seed={seed} />
+        <Glow h={h * 0.18} colors={glowColors(colors, true)} seed={seed} />
       </mesh>
       <mesh position-y={baseH + h * 0.18}>
         <sphereGeometry args={[r * 1.15, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <Glow h={r * 2.3} colors={colors} seed={seed + 0.4} />
+        <Glow h={r * 2.3} colors={glowColors(colors, true)} seed={seed + 0.4} />
       </mesh>
     </>
   );
@@ -367,8 +388,9 @@ function Clock({ data, colors, seed }: ShapeProps) {
       </mesh>
       <mesh position-y={baseH + towerH + h * 0.16} raycast={noRaycast}>
         <coneGeometry args={[tw * 0.25, h * 0.12, 8]} />
-        <Glow h={h * 0.12} colors={colors} seed={seed} />
+        <Glow h={h * 0.12} colors={glowColors(colors, true)} seed={seed} />
       </mesh>
+      <Cornice w={w} d={d} y={baseH + 0.05} color={colors[2]} />
     </>
   );
 }
@@ -397,10 +419,11 @@ function Pyramid({ data, colors, seed }: ShapeProps) {
         <edgesGeometry args={[geometry]} />
         <lineBasicMaterial color={colors[2]} transparent opacity={0.5} />
       </lineSegments>
-      <mesh position-y={baseH + h * 0.09} rotation-y={Math.PI / 4} raycast={noRaycast}>
-        <coneGeometry args={[Math.max(w, d) * 0.66, h * 0.18, 4]} />
-        <Glow h={h * 0.18} colors={roof} seed={seed} />
+      <mesh position-y={baseH + h * 0.14} rotation-y={Math.PI / 4} raycast={noRaycast}>
+        <coneGeometry args={[Math.max(w, d) * 0.72, h * 0.28, 4]} />
+        <Glow h={h * 0.28} colors={roof} seed={seed} />
       </mesh>
+      {isFloodlit(data) && <Cornice w={w} d={d} y={baseH + 0.05} color={colors[2]} />}
     </>
   );
 }

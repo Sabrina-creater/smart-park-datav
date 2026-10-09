@@ -65,7 +65,7 @@ export const BuildingMaterial = extend(
         float wy = smoothstep(0.2, 0.32, cell.y) * (1.0 - smoothstep(0.62, 0.74, cell.y));
         float win = wx * wy * side * step(0.03, h) * step(h, 0.95);
         float lit = step(0.5, hash(cellId + uSeed + floor(uTime * 0.12) * 0.37));
-        col += uWindow * win * (0.18 + 0.55 * lit) * (1.0 - 0.45 * uFlood);
+        col += uWindow * win * (0.12 + 0.4 * lit) * (1.0 - 0.45 * uFlood);
 
         // 泛光照明：檐口发光 + 立面柱廊竖向亮纹
         float cornice = smoothstep(0.86, 0.95, h) * (1.0 - step(0.985, h));
@@ -83,16 +83,18 @@ export const BuildingMaterial = extend(
         float band = 0.12;
         float p = fract(uTime * 0.18 + uSeed) * (1.0 + 2.0 * band) - band;
         float scan = 1.0 - smoothstep(0.0, band, abs(h - p));
-        col += uScan * scan * 0.75;
+        col += uScan * scan * 0.45;
 
-        // 顶面
+        // 顶面：泛光建筑的屋顶保持深色，让檐口灯带成为亮线
         if (vNormal.y > 0.5) {
-          col = mix(uTop, uScan, 0.4 + 0.4 * uFlood);
+          col = mix(mix(uTop, uScan, 0.4), uTop * 0.35, uFlood);
         }
 
         col += uScan * uHighlight * 0.45;
 
         gl_FragColor = vec4(col, uOpacity);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
       }
     `
   )
@@ -146,16 +148,18 @@ export const LandmarkMaterial = extend(
         vec3 col = mix(uBottom, uTop, h);
 
         float fresnel = pow(1.0 - max(dot(normalize(vWorldNormal), normalize(vViewDir)), 0.0), 2.5);
-        col += uScan * fresnel * 0.9;
+        col += uScan * fresnel * 0.55;
 
         float band = 0.14;
         float p = fract(uTime * 0.18 + uSeed) * (1.0 + 2.0 * band) - band;
         float scan = 1.0 - smoothstep(0.0, band, abs(h - p));
-        col += uScan * scan * 0.6;
+        col += uScan * scan * 0.35;
 
         col += uScan * uHighlight * 0.45;
 
         gl_FragColor = vec4(col, uOpacity);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
       }
     `
   )

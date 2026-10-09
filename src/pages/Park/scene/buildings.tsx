@@ -44,13 +44,20 @@ function updateUniforms(
   root: Group,
   delta: number,
   highlight: number,
-  opacity: number
+  opacity: number,
+  tint?: Colors
 ) {
   root.traverse((o) => {
     const mat = (o as Mesh).material as ShaderMaterial | undefined;
     const u = mat?.uniforms;
     if (!u?.uTime) return;
     u.uTime.value += delta;
+    // drei 的 shaderMaterial 会复制颜色 prop，逐帧变色需直接写入 uniform
+    if (tint && u.uBottom && u.uTop && u.uScan) {
+      (u.uBottom.value as Color).copy(tint[0]);
+      (u.uTop.value as Color).copy(tint[1]);
+      (u.uScan.value as Color).copy(tint[2]);
+    }
     if (u.uHighlight) {
       u.uHighlight.value = MathUtils.lerp(u.uHighlight.value, highlight, 0.12);
     }
@@ -109,7 +116,13 @@ function BuildingMesh({ data }: { data: Building }) {
 
   useFrame((state, delta) => {
     if (pearl) cyclePearl(colors, state.clock.elapsedTime);
-    updateUniforms(groupRef.current, delta, isActive ? 1 : 0, isDimmed ? 0.5 : 1);
+    updateUniforms(
+      groupRef.current,
+      delta,
+      isActive ? 1 : 0,
+      isDimmed ? 0.5 : 1,
+      pearl ? colors : undefined
+    );
   });
 
   return (

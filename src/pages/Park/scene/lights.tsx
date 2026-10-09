@@ -1,3 +1,10 @@
+import { buildings } from "@/data/bund";
+
+const pearl = buildings.find((b) => b.shape === "pearl");
+const pearlPos: [number, number, number] = pearl
+  ? [pearl.position[0], 18, pearl.position[1] + 2]
+  : [0, 18, -10];
+
 export default function Lights() {
   return (
     <>
@@ -8,26 +15,11 @@ export default function Lights() {
         position={[40, 80, 30]}
         color="#dceeff"
       />
-      {/* 东方明珠的粉紫色环境光，映在江面上 */}
-      <pointLight
-        intensity={900}
-        distance={60}
-        position={[15.5, 18, -8]}
-        color="#ff5fd6"
-      />
+      {/* 东方明珠的粉紫色环境光，映在江面上（位置跟随数据） */}
+      <pointLight intensity={900} distance={60} position={pearlPos} color="#ff5fd6" />
       {/* 外滩泛光的暖色环境光 */}
-      <pointLight
-        intensity={700}
-        distance={70}
-        position={[-6, 10, 12]}
-        color="#ffb860"
-      />
-      <pointLight
-        intensity={500}
-        distance={60}
-        position={[22, 10, 12]}
-        color="#ffb860"
-      />
+      <pointLight intensity={700} distance={70} position={[6, 10, 12]} color="#ffb860" />
+      <pointLight intensity={500} distance={60} position={[-22, 10, 12]} color="#ffb860" />
     </>
   );
 }

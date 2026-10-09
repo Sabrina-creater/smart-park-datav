@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Instance, Instances } from "@react-three/drei";
 import { AdditiveBlending } from "three";
-import { lampLines } from "@/data/bund";
+import { lampLines, waters } from "@/data/bund";
 import { getRadialTexture } from "./textures";
 
 const WARM = "#ffd58a";
@@ -26,9 +26,27 @@ export default function Lamps() {
   const lamps = useMemo(generateLamps, []);
   const tex = getRadialTexture();
   const poleH = 2.2;
+  // 外滩江堤的连续灯带：沿黄浦江浦西岸线，从苏州河口到南端
+  const [river, creek] = waters;
+  const stripFrom = creek.x[1] + 0.5;
+  const stripTo = river.x[1] - 2;
 
   return (
     <group raycast={() => null}>
+      <mesh position={[(stripFrom + stripTo) / 2, 0.2, river.z[1] - 0.05]}>
+        <boxGeometry args={[stripTo - stripFrom, 0.08, 0.12]} />
+        <meshBasicMaterial color="#ffd58a" />
+      </mesh>
+      <mesh position={[(stripFrom + stripTo) / 2, 0.21, river.z[1] - 0.05]}>
+        <boxGeometry args={[stripTo - stripFrom, 0.5, 0.9]} />
+        <meshBasicMaterial
+          transparent
+          color={WARM}
+          opacity={0.12}
+          depthWrite={false}
+          blending={AdditiveBlending}
+        />
+      </mesh>
       <Instances limit={lamps.length} range={lamps.length}>
         <cylinderGeometry args={[0.04, 0.06, poleH, 6]} />
         <meshStandardMaterial color="#2a3a55" roughness={0.8} metalness={0.4} />
@@ -45,11 +63,11 @@ export default function Lamps() {
       </Instances>
       {/* 灯头光晕 */}
       <Instances limit={lamps.length} range={lamps.length}>
-        <sphereGeometry args={[0.5, 10, 8]} />
+        <sphereGeometry args={[0.8, 10, 8]} />
         <meshBasicMaterial
           transparent
           color={WARM}
-          opacity={0.16}
+          opacity={0.3}
           depthWrite={false}
           blending={AdditiveBlending}
         />
@@ -59,12 +77,12 @@ export default function Lamps() {
       </Instances>
       {/* 地面光斑 */}
       <Instances limit={lamps.length} range={lamps.length}>
-        <planeGeometry args={[3.2, 3.2]} />
+        <planeGeometry args={[4.5, 4.5]} />
         <meshBasicMaterial
           transparent
           map={tex}
           color={WARM}
-          opacity={0.35}
+          opacity={0.45}
           depthWrite={false}
           blending={AdditiveBlending}
         />
