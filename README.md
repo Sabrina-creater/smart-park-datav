@@ -100,7 +100,8 @@ src/
 └── pages/Park/
     ├── index.tsx           # 页面入口
     ├── scene/              # 3D 场景
-    │   ├── index.tsx       # Canvas / 灯光 / 控制器
+    │   ├── index.tsx       # Canvas / 控制器 / 场景组装
+    │   ├── lights.tsx      # 环境光与两岸点光源
     │   ├── materials.tsx   # 立面 / 曲面 / 光束 / 波光 / LED 巨幕 / 探照灯 Shader
     │   ├── textures.ts     # 运行时生成的径向光晕贴图
     │   ├── lamps.tsx       # 路灯（Instanced）

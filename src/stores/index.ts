@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
+import { overview } from "@/data/bund";
 
 interface ConfigState {
   /** 开场动画是否完成 */
@@ -56,16 +57,16 @@ interface LiveState {
 
 /** 模拟实时数据：每隔几秒变化，接真实接口时替换 tick 即可 */
 export const useLiveStore = create<LiveState>()((set) => ({
-  visitorsToday: 86420,
-  peopleNow: 23800,
-  energyToday: 42600,
-  devicesOnline: 3860,
+  visitorsToday: overview.visitorsToday,
+  peopleNow: overview.peopleNow,
+  energyToday: overview.energyToday,
+  devicesOnline: overview.devicesOnline,
   tick: () =>
     set((s) => ({
       visitorsToday: s.visitorsToday + 8 + Math.round(Math.random() * 20),
       peopleNow: Math.max(
-        18000,
-        s.peopleNow + Math.round((Math.random() - 0.45) * 120)
+        Math.round(overview.peopleNow * 0.8),
+        s.peopleNow + Math.round((Math.random() - 0.45) * 200)
       ),
       energyToday: s.energyToday + 6 + Math.round(Math.random() * 12),
       devicesOnline: 3850 + Math.round(Math.random() * 20),
